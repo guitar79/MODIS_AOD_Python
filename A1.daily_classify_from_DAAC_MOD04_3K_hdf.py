@@ -8,7 +8,7 @@
 #conda activate MODIS_hdf_Python_env && cd /mnt/Rdata/RS-data/KOSC/MODIS_AOD_Python/ && A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 1.0 2019
 #conda activate MODIS_hdf_Python_env && cd /mnt/6TB1/RS_data/MODIS_AOD/MODIS_AOD_Python/ && python A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2000
 #conda activate MODIS_hdf_Python_env && cd /mnt/MODIS_AOD/MODIS_AOD_Python/ && python A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2002
-#conda activate MODIS_hdf_Python_env && cd /mnt/MODIS_AOD/MODIS_AOD_Python/ && for yr in {2000..2020}; do python A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 $yr; done
+#conda activate MODIS_AOD_Python_env && cd /mnt/MODIS_AOD/MODIS_AOD_Python/ && for yr in {2000..2020}; do python A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 $yr; done
 '''
 
 from datetime import datetime
