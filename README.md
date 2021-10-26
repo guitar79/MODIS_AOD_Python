@@ -3,6 +3,7 @@
 anaconda environment
 
 conda create -n MODIS_AOD_Python_env python=3.8
+
 conda env list
 
 # activate 가상환경 시작
@@ -14,14 +15,16 @@ activate MODIS_AOD_Python_env
 
 # deactivate 가상환경 종료
 mac/linux
+
 conda deactivate
 
 windows
+
 deactivate
 
 # install module
-conda install pandas spyder
-conda install -c conda-forge pyhdf basemap basemap-date-hires
+conda install pandas spyder basemap basemap-data-hires cartopy
+conda install -c conda-forge pyhdf 
 
 
 # 가상환경 내보내기 (export)
