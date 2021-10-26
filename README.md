@@ -25,6 +25,7 @@ deactivate
 # install module
 conda install pandas spyder basemap basemap-data-hires cartopy
 conda install -c conda-forge pyhdf 
+pip install cartopy
 
 
 # 가상환경 내보내기 (export)
