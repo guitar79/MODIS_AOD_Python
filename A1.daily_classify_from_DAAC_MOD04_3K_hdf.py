@@ -358,7 +358,8 @@ for proc_date in proc_dates[:]:
                                     np.nanmax(latitude), np.nanmin(latitude), str(hdf_raw.attributes()))
             
                 except Exception as err :
-                    MODIS_hdf_utilities.write_log(err_log_file, err)
+                    #MODIS_hdf_utilities.write_log(err_log_file, err)
+                    print(err)
                     continue
 
             processing_log += "#processing finished!!!\n"
