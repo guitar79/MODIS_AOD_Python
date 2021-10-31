@@ -1,5 +1,5 @@
 
-# MODIS_hdf_Python
+# MODIS_AOD_Python
 anaconda environment
 
 conda create -n MODIS_AOD_Python_env python=3.8
