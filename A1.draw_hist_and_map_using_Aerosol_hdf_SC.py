@@ -52,7 +52,7 @@ class Plotter():
         self.working_Jday = MODIS_AOD_utilities.datestr_to_JDay(self.working_Date, "%Y-%m-%d")
         self.working_Date = datetime.strptime(self.working_Date, "%Y-%m-%d")
 
-        print("Starting...   working_Date: {}".format(working_Date))
+        print("Starting...   working_Date: {}".format(self.working_Date))
 
         # get fullnames
         self.fullnames = Python_utilities.getFullnameListOfallFiles("{}{}".format(base_dr, self.working_Date.strftime("%Y/")))
@@ -131,7 +131,7 @@ class Plotter():
                             print("str(hdf_raw.attributes()): {}".format(str(self.hdf_raw.attributes())))
                             
                             #self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
-
+                            print("plotting histogram {}".format(self.fullname))
                             self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
                                                                               DATAFIELD_NAME, Dataset_DOI)
                             self.plt_hist.savefig("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
@@ -141,8 +141,9 @@ class Plotter():
                                                           "{}{}_hist.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
                             # Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
+                            print("plotting on the map {}".format(self.fullname))
                             self.plt_map = MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(self.hdf_value, self.longitude, self.latitude, self.fullname,
-                                                                                     self.DATAFIELD_NAME, self.Dataset_DOI)
+                                                                                     DATAFIELD_NAME, Dataset_DOI)
                             self.plt_map.savefig("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
                             self.plt_map.close()
                             ######################################################################################

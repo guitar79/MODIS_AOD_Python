@@ -133,26 +133,15 @@ for working_Date in working_Datetetimes[:]:
                 print("hdf_value: {}".format(hdf_value))
                 print("str(hdf_raw.attributes()): {}".format(str(hdf_raw.attributes())))
 
-                Wlon, Elon, Slat, Nlat, Clon, Clat = MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
-
-            except Exception as err:
-                # MODIS_AOD_utilities.write_log(err_log_file, err)
-                print(err)
-                continue
-
-            try :
+                #Wlon, Elon, Slat, Nlat, Clon, Clat = MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
+                print("plotting histogram {}".format(fullname))
                 plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
                 plt_hist.savefig("{}{}_hist.png".format(save_dr, fullname_el[-1][:-4]), overwrite=True)
                 plt_hist.close()
                 ######################################################################################
                 Python_utilities.write_log(log_file, "{}{}_hist.png is created...".format(save_dr, fullname_el[-1][:-4]))
 
-            except Exception as err:
-                # MODIS_AOD_utilities.write_log(err_log_file, err)
-                print(err)
-                continue
-
-            try:
+                print("plotting on the map {}".format(fullname))
                 #Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
                 plt_map = MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
                 plt_map.savefig("{}{}_map.png".format(save_dr, fullname_el[-1][:-4]), overwrite=True)
