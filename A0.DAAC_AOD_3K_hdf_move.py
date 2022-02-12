@@ -8,7 +8,7 @@ from datetime import datetime
 import os
 import sys
 import shutil 
-import MODIS_hdf_utilities
+import MODIS_AOD_utilities
 
 arg_mode = True
 #arg_mode =  False

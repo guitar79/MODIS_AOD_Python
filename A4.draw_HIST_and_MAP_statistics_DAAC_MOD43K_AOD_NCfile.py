@@ -5,7 +5,7 @@ import sys
 
 from netCDF4 import Dataset as NetCDFFile 
 
-import MODIS_hdf_utilities
+import MODIS_AOD_utilities
 
 
 log_file = os.path.basename(__file__)[:-3]+".log"

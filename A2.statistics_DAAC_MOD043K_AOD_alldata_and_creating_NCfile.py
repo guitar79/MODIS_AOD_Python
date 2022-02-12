@@ -14,7 +14,7 @@ import numpy as np
 import netCDF4 as nc
 import os
 import sys
-import MODIS_hdf_utilities
+import MODIS_AOD_utilities
 
 log_file = os.path.basename(__file__)[:-3]+".log"
 err_log_file = os.path.basename(__file__)[:-3]+"_err.log"

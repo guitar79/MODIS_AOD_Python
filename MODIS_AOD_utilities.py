@@ -16,54 +16,10 @@ from datetime import datetime
 import os
 from pyhdf.SD import SD, SDC
 
-def write_log2(log_file, log_str):
-    import os
-    with open(log_file, 'a') as log_f:
-        log_f.write("{}, {}\n".format(os.path.basename(__file__), log_str))
-    return print ("{}, {}\n".format(os.path.basename(__file__), log_str))
-
-def write_log(log_file, log_str):
-    import time
-    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
-    msg = '[' + timestamp + '] ' + log_str
-    print (msg)
-    with open(log_file, 'a') as f:
-        f.write(msg + '\n')
-
 #for checking time
 cht_start_time = datetime.now()
 
 
-def getFullnameListOfallsubDirs(dirName):
-    ##############################################3
-    import os
-    allFiles = list()
-    for it in os.scandir(dirName):
-        if it.is_dir():
-            allFiles.append(it.path)
-            allFiles.extend(getFullnameListOfallsubDirs(it))
-
-    return allFiles
-
-
-def getFullnameListOfallFiles(dirName):
-    ##############################################3
-    import os
-    # create a list of file and sub directories 
-    # names in the given directory 
-    listOfFile = sorted(os.listdir(dirName))
-    allFiles = list()
-    # Iterate over all the entries
-    for entry in listOfFile:
-        # Create full path
-        fullPath = os.path.join(dirName, entry)
-        # If entry is a directory then get the list of files in this directory 
-        if os.path.isdir(fullPath):
-            allFiles = allFiles + getFullnameListOfallFiles(fullPath)
-        else:
-            allFiles.append(fullPath)
-                
-    return allFiles
 
 #JulianDate_to_date(2018, 131) -- '20180511'
 def JulianDate_to_date(y, jd):
@@ -86,26 +42,13 @@ def date_to_JulianDate(dt, fmt):
     tt = dt.timetuple()
     return int('%d%03d' % (tt.tm_year, tt.tm_yday))
 
-
-
-def getFullnameListOfallFiles(dirName):
-    ##############################################3
-    import os
-    # create a list of file and sub directories 
-    # names in the given directory 
-    listOfFile = sorted(os.listdir(dirName))
-    allFiles = list()
-    # Iterate over all the entries
-    for entry in listOfFile:
-        # Create full path
-        fullPath = os.path.join(dirName, entry)
-        # If entry is a directory then get the list of files in this directory 
-        if os.path.isdir(fullPath):
-            allFiles = allFiles + getFullnameListOfallFiles(fullPath)
-        else:
-            allFiles.append(fullPath)
-                
-    return allFiles
+def datestr_to_JDay(dt, fmt):
+    ############################################################
+    #date_to_JulianDate('20180201', '%Y%m%d') -- 2018032
+    #
+    dt = datetime.strptime(dt, fmt)
+    tt = dt.timetuple()
+    return '{:03d}'.format(tt.tm_yday)
 
 def fullname_to_datetime_for_DAAC3K(fullname):
     ############################################################
@@ -189,16 +132,25 @@ def fullname_to_datetime_for_KOSC_MODIS_hdf(fullname):
     return filename_dt
 
 
-def draw_histogram_hdf(hdf_value, longitude, latitude, save_dir_name, fullname, DATAFIELD_NAME):
+def draw_histogram_hdf(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI):
     fullname_el = fullname.split("/")
+    ############################################################
     import matplotlib.pyplot as plt
     import numpy as np
-    plt.figure(figsize=(12, 8))
-    plt.title("Histogram of {0}: \n{1}\nmean : {2:.02f}, max: {3:.02f}, min: {4:.02f}\n\
-              longigude : {5:.02f}~{6:.02f}, latitude: {7:.02f}~{8:.02f}".format(DATAFIELD_NAME, fullname_el[-1],\
-                                      np.nanmean(hdf_value), np.nanmax(hdf_value), np.nanmin(hdf_value),\
-                                      np.nanmin(longitude), np.nanmax(longitude),\
-                                      np.nanmin(latitude), np.nanmax(latitude)), fontsize=9)
+    Wlon, Elon, Slat, Nlat, Clon, Clat = findRangeOfMap(longitude, latitude)
+    plt.figure(figsize=(10, 10))
+    plt.title("Histogram of {0}".format(DATAFIELD_NAME), fontsize=20, pad=30)
+    plt.annotate(
+        "value mean: {0:.02f}, min: {1:.02f} max: {2:.02f}, \nlongigude : {3:.02f}~{4:.02f}\nlatitude: {5:.02f}~{6:.02f}". \
+        format(np.nanmean(hdf_value), np.nanmin(hdf_value), np.nanmax(hdf_value), \
+               Wlon, Elon, Slat, Nlat,),
+        xy=(0, 0), xytext=(0, -28), va='top', ha='left',
+        xycoords='axes fraction', textcoords='offset points')
+
+    plt.annotate('Created by guitar79@gs.hs.kr\nDataset DOI: {}\n{}'.format(Dataset_DOI, fullname_el[-1]),
+                 xy=(1, 0), xytext=(0, -28), va='top', ha='right',
+                 xycoords='axes fraction', textcoords='offset points')
+
     plt.hist(hdf_value)
     plt.grid(True)
 
@@ -209,20 +161,80 @@ def draw_histogram(hdf_value, longitude, latitude, save_dir_name, fullname, DATA
     import matplotlib.pyplot as plt
     import numpy as np
     plt.figure(figsize=(12, 8))
+    plt.title("Histogram of {0} \n".format(DATAFIELD_NAME), fontsize=16)
+    plt.annotate('created by guitar79@gs.hs.kr\nAir quality procuct using AirKorea data',
+                 xy=(1, 0), xytext=(12, -28), va='top', ha='right',
+                 xycoords='axes fraction', textcoords='offset points')
     plt.title("Histogram of {0}: \n{1}\nmean : {2:.02f}, max: {3:.02f}, min: {4:.02f}\n\
-              longigude : {5:.02f}~{6:.02f}, latitude: {7:.02f}~{8:.02f}".format(DATAFIELD_NAME, fullname_el[-1],\
-                                      np.nanmean(hdf_value), np.nanmax(hdf_value), np.nanmin(hdf_value),\
-                                      np.nanmin(longitude), np.nanmax(longitude),\
-                                      np.nanmin(latitude), np.nanmax(latitude)), fontsize=9)
+                  longigude : {5:.02f}~{6:.02f}, latitude: {7:.02f}~{8:.02f}".format(DATAFIELD_NAME, fullname_el[-1], \
+                                                                                     np.nanmean(hdf_value),
+                                                                                     np.nanmax(hdf_value),
+                                                                                     np.nanmin(hdf_value), \
+                                                                                     np.nanmin(longitude),
+                                                                                     np.nanmax(longitude), \
+                                                                                     np.nanmin(latitude),
+                                                                                     np.nanmax(latitude)), fontsize=9)
     plt.hist(hdf_value)
     plt.grid(True)
-    plt.savefig("{0}{1}_{2}_hist.png"\
-        .format(save_dir_name, fullname_el[-1][:-4], DATAFIELD_NAME))
-    print("{0}{1}_{2}_hist.png is created..."\
-        .format(save_dir_name, fullname_el[-1][:-4], DATAFIELD_NAME))
-    plt.close()
-    return None
+    return plt
 
+
+def draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI):
+    fullname_el = fullname.split("/")
+    ######################################################################################
+    from mpl_toolkits.basemap import Basemap
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(10, 10))
+    Wlon, Elon, Slat, Nlat, Clon, Clat = findRangeOfMap(longitude, latitude)
+    # map
+    m = Basemap(projection='laea', lat_ts=Clat, lat_0=Clat, lon_0=Clon, \
+                width=0.25e7, height=0.25e7, resolution="i")
+
+    # draw & fill
+    m.drawcoastlines(linewidth=0.25)
+    m.drawcountries(linewidth=0.25)
+    m.fillcontinents()
+
+    m.drawparallels(np.arange(-90., 90.1, 5.), labels=[1, 1, 0, 0])
+    m.drawmeridians(np.arange(-180., 180.1, 5.), labels=[0, 0, 1, 1])
+
+    # plot data on the map
+    x, y = m(longitude, latitude)
+    m.pcolormesh(x, y, hdf_value)
+    m.colorbar(fraction=0.0455, pad=0.044)
+
+    # set title and annotate
+    plt.title('MODIS {}'.format(DATAFIELD_NAME), fontsize=20, pad=30)
+
+    plt.annotate("Maximun value: {0:.1f}\nMean value: {1:.1f}\nMin value: {2:.1f}" \
+                 .format(np.nanmax(hdf_value), np.nanmean(hdf_value), np.nanmin(hdf_value)),
+                 xy=(0, 0), xytext=(0, -28), va='top', ha='left',
+                 xycoords='axes fraction', textcoords='offset points')
+
+    plt.annotate('Created by guitar79@gs.hs.kr\nDataset DOI: {}\n{}'.format(Dataset_DOI, fullname_el[-1]),
+                 xy=(1, 0), xytext=(0, -28), va='top', ha='right',
+                 xycoords='axes fraction', textcoords='offset points')
+
+    return plt
+
+def findRangeOfMap(longitude, latitude):
+    # 입력 변수는 위도와 경도의 numpy.array 임에 유의하자
+    # 출력 값은 경도와 위도의 동서남북 경계와 중심 좌표으로 float이다
+    longitude360 = longitude + 180
+    latitude180 = latitude + 90
+
+    Slat = np.nanmin(latitude180) - 90
+    Nlat = np.nanmax(latitude180) - 90
+    Clon = ((np.nanmax(longitude360) + np.nanmin(longitude360)) / 2) - 180
+    Clat = ((np.nanmax(latitude180) + np.nanmin(latitude180)) / 2) - 90
+    if np.nanmax(longitude) - np.nanmax(longitude) > 180 :
+        Wlon = np.nanmax(longitude360) - 180
+        Elon = np.nanmin(longitude360) - 180
+    else:
+        Wlon = np.nanmin(longitude360) - 180
+        Elon = np.nanmax(longitude360) - 180
+
+    return Wlon, Elon, Slat, Nlat, Clon, Clat
 
 def draw_map_MODIS_hdf(hdf_value, longitude, latitude, save_dir_name, fullname, DATAFIELD_NAME, Llon, Rlon, Slat, Nlat):
     fullname_el = fullname.split("/")
@@ -616,7 +628,6 @@ def read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME):
     if DATAFIELD_NAME in hdf.datasets() :
         hdf_raw = hdf.select(DATAFIELD_NAME)
         print("found data set of {}: {}".format(DATAFIELD_NAME, hdf_raw))
-        
     else : 
         print("There is no data set of {}: {}".format(DATAFIELD_NAME, hdf_raw))
         hdf_raw = np.arange(0)

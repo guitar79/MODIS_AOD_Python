@@ -27,7 +27,7 @@ import numpy as np
 import os
 import sys
 from sys import argv
-import MODIS_hdf_utilities
+import MODIS_AOD_utilities
 
 #script, L3_perid, yr = argv # Input L3_perid : 'weekly' 'monthly' 'daily'
 print("argv: {}".format(argv))

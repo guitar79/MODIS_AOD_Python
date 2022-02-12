@@ -15,7 +15,7 @@ from datetime import datetime
 import numpy as np
 import os
 import sys
-import MODIS_hdf_utilities
+import MODIS_AOD_utilities
 
 arg_mode = True
 #arg_mode =  False

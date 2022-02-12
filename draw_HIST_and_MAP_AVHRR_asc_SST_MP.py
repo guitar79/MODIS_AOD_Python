@@ -15,7 +15,7 @@ from glob import glob
 from datetime import datetime
 import numpy as np
 import os
-import MODIS_hdf_utilities
+import MODIS_AOD_utilities
 
 import sys
 from sys import argv # input option
