@@ -334,6 +334,7 @@ class Classifier():
                             .format(save_dr, DATAFIELD_NAME,
                             self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
                             str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
+                sys.stderr.write("Thread #%d failed...retry\n" % self.threadno)
 
 class Classify_unit(threading.Thread):
     # def __init__(self, working_Date, threadno):
@@ -394,7 +395,7 @@ print("len(proc_dates): {}".format(len(proc_dates)))
 
 threadno = 1
 
-num_thread = 500
+num_thread = 50
 num_batches = len(proc_dates) // num_thread + 1
 
 for batch in range(num_batches):
