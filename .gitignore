@@ -1,3 +1,2 @@
-!
-*.log
-logs/*.log
+!*.log
+!logs/*.log

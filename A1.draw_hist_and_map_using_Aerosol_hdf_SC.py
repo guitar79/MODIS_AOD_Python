@@ -127,7 +127,7 @@ class Plotter():
                             
                             self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
                             #filename, Wlon, Elon, Slat, Nlat, mean(hdf_value), min(hdf_value), max(hdf_value), hdf_raw.attributes()
-                            self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}".format(self.fullname_el[-1], self.Wlon, self.Elon, self.Slat, self.Nlat,
+                            self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}\n".format(self.fullname_el[-1], self.Wlon, self.Elon, self.Slat, self.Nlat,
                                                                         np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
                                                                         self.hdf_raw.attributes())
                             with open("{}.csv".format(base_dr[:-1]), 'a') as f_info:
@@ -174,13 +174,13 @@ class plot_unit(threading.Thread):
                 sys.stderr.write('Thread #{} - fetched {}...\n'.format(self.threadno, self.working_Date))
 
 from dateutil.relativedelta import relativedelta
-set_S_datetime = datetime(2003, 1, 1) #convert startdate to date type
+set_S_datetime = datetime(2000, 1, 1) #convert startdate to date type
 set_E_datetime = datetime(2021, 12, 31)
 
 working_datetimes = [set_S_datetime.strftime("%Y-%m-%d")]
 date1 = set_S_datetime
 while date1 < set_E_datetime :
-    date1 += relativedelta(days=1)
+    date1 += relativedelta(years=1)
     working_datetimes.append(date1.strftime("%Y-%m-%d"))
 print(working_datetimes)
 #########################################
