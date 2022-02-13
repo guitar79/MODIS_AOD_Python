@@ -105,7 +105,7 @@ class Classifier():
                 self.file_no = 0
                 self.processing_log += "#processing file Num : {}\n".format(len(self.df_proc["fullname"]))
                 self.processing_log += "#processing file list\n"
-                self.processing_log += "file No, total_data_dount, data_count, filename, mean(sst), max(sst), min(sst), min(self.longitude), max(self.longitude), min(self.latitude), max(self.latitude)\n"
+                self.processing_log += "#file No, total_data_dount, data_count, filename, mean(sst), max(sst), min(sst), min(self.longitude), max(self.longitude), min(self.latitude), max(self.latitude)\n"
                 self.array_alldata = array_data.copy()
                 print('self.array_alldata is copied...........\n')
 
@@ -283,8 +283,8 @@ class Classifier():
                                                 (self.fullname_el[-1], self.hdf_value[i][j]))
 
                                         ### print("self.array_alldata[{}][{}].append({}, {})" \
-                                        ###         .format(int(self.lon_cood[i][j]), int(self.lat_cood[i][j]), self.fullname_el[-1],
-                                        ###             self.hdf_value[i][j]))
+                                        ###        .format(int(self.lon_cood[i][j]), int(self.lat_cood[i][j]), self.fullname_el[-1],
+                                        ###            self.hdf_value[i][j]))
                                         # print("{} data added...".format(self.data_cnt))
 
                             self.total_data_cnt += self.data_cnt
@@ -330,17 +330,16 @@ class Classifier():
 
                 print('#' * 60)
                 Python_utilities.write_log(log_file,
-                                           '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are is created.\n' \
-                                           .format(save_dr, DATAFIELD_NAME,
-                                                   self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
-                                                   str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
+                        '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are is created.\n' \
+                            .format(save_dr, DATAFIELD_NAME,
+                            self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
+                            str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
 
 class Classify_unit(threading.Thread):
     # def __init__(self, working_Date, threadno):
-    def __init__(self, proc_dates, df, threadno):
+    def __init__(self, proc_dates, threadno):
         threading.Thread.__init__(self)
         self.proc_dates = proc_dates
-        df = df
         # self.working_Date = working_Date
         self.threadno = threadno
         sys.stderr.write('Thread #{} started...\n'.format(self.threadno))
@@ -352,7 +351,7 @@ class Classify_unit(threading.Thread):
             sys.stderr.write('Thread #{} - fetched {}...\n'.format(self.threadno, self.proc_date))
 
 fullnames = []
-for dirName in base_drs[:] :
+for dirName in base_drs :
     #dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
     try :
         fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
@@ -393,9 +392,15 @@ while date2 < set_E_datetime :
 print("len(proc_dates): {}".format(len(proc_dates)))
 #########################################
 
-if __name__ == '__main__' :
-	threadno = 0
-	#num_thread = 10000
-	for proc_date in proc_dates:
-		fetcher = Classifier(proc_date, threadno)
-		fetcher.fetch()
+threadno = 1
+
+num_thread = 500
+num_batches = len(proc_dates) // num_thread + 1
+
+for batch in range(num_batches):
+	#for working_Ho in working_datetimes :
+	#mergeunit = merge_unit(working_Ho, threadno)
+	Classifyunit = Classify_unit(proc_dates[batch*num_batches:(batch+1)*num_batches], threadno)
+	#merger.daemon = True
+	Classifyunit.start()
+	threadno += 1

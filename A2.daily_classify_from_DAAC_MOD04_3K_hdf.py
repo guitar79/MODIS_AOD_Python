@@ -79,7 +79,6 @@ print("Only hdf file in df:\n{}".format(df))
 for idx, row in df.iterrows():
     print(row["fullname"])
     df.at[idx, "fullname_dt"] = MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.loc[idx, "fullname"])
-    #df["fullname_dt"] = MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.fullname.str)
 
 df.index = df['fullname_dt']
 print("make datetime column in df:\n{}".format(df))
@@ -90,7 +89,7 @@ print("make datetime column in df:\n{}".format(df))
 proc_dates = []
 
 from dateutil.relativedelta import relativedelta
-set_S_datetime = datetime(2000, 6, 1)  # convert startdate to date type
+set_S_datetime = datetime(2000, 2, 25)  # convert startdate to date type
 set_E_datetime = datetime(2022, 1, 1)
 date1 = set_S_datetime
 date2 = set_S_datetime
@@ -112,7 +111,8 @@ for proc_date in proc_dates[:]:
     df_proc = df[(df['fullname_dt'] >= proc_date[0]) & (df['fullname_dt'] < proc_date[1])]
 
     # check file exist??
-    if False or (os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
+
+    if False and (os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
                               .format(save_dr, DATAFIELD_NAME, proc_date[0].strftime('%Y%m%d'),
                                       proc_date[1].strftime('%Y%m%d'),
                                       str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))) \
@@ -330,11 +330,11 @@ for proc_date in proc_dates[:]:
                                     # print("{} data added...".format(data_cnt))
 
                         total_data_cnt += data_cnt
-                        Wlon, Elon, Slat, Nlat, Clon, Clat = MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
+                        Wlon1, Elon1, Slat1, Nlat1, Clon1, Clat1 = MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
                         processing_log += "{0}, {1}, {2}, {3}, {4:.02f}, {5:.02f}, {6:.02f}, {7:.02f}, {8:.02f}, {9:.02f}, {10:.02f}, {11}\n" \
                             .format(str(file_no), str(total_data_cnt), str(data_cnt), str(fullname),
                                 np.nanmean(hdf_value), np.nanmax(hdf_value), np.nanmin(hdf_value),
-                                Wlon, Elon, Slat, Nlat, str(hdf_raw.attributes()))
+                                Wlon1, Elon1, Slat1, Nlat1, str(hdf_raw.attributes()))
 
                 except Exception as err:
                     # Python_utilities.write_log(err_log_file, err)
@@ -357,6 +357,11 @@ for proc_date in proc_dates[:]:
                     .format(save_dr, DATAFIELD_NAME,
                         proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),
                         str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), array_alldata)
+                Python_utilities.write_log(log_file,
+                        '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy is created...' \
+                        .format(save_dr, DATAFIELD_NAME,
+                        proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),
+                        str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
 
                 with open('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.txt' \
                     .format(save_dr, DATAFIELD_NAME,
