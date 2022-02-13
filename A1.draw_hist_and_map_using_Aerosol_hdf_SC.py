@@ -51,9 +51,7 @@ class Plotter():
     def fetch(self):
         self.working_Jday = MODIS_AOD_utilities.datestr_to_JDay(self.working_Date, "%Y-%m-%d")
         self.working_Date = datetime.strptime(self.working_Date, "%Y-%m-%d")
-
         print("Starting...   working_Date: {}".format(self.working_Date))
-
         # get fullnames
         self.fullnames = Python_utilities.getFullnameListOfallFiles("{}{}".format(base_dr, self.working_Date.strftime("%Y/")))
 
@@ -61,9 +59,7 @@ class Plotter():
             print("There is no file in {}...".format(self.fullnames))
         else:
             print(self.fullnames)
-
             for self.fullname in self.fullnames:
-    
                 if self.fullname[-4:].lower() == ".hdf":
 
                     print("Starting...   self.fullname: {}".format(self.fullname))
@@ -76,7 +72,6 @@ class Plotter():
                         print("{0}{1}_map.png and {0}{1}_hist.png are already exist...".format(self.save_dr, self.fullname_el[-1][:-4]))
                     else:
                         print("Reading hdf file {0}\n".format(self.fullname))
-
                         try:
                             self.hdf_raw, self.latitude, self.longitude, self.cntl_pt_cols, self.cntl_pt_rows \
                                 = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
@@ -130,7 +125,14 @@ class Plotter():
                             print("hdf_value: {}".format(self.hdf_value))
                             print("str(hdf_raw.attributes()): {}".format(str(self.hdf_raw.attributes())))
                             
-                            #self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
+                            self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
+                            #filename, Wlon, Elon, Slat, Nlat, mean(hdf_value), min(hdf_value), max(hdf_value), hdf_raw.attributes()
+                            self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}".format(self.fullname_el[-1], self.Wlon, self.Elon, self.Slat, self.Nlat,
+                                                                        np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
+                                                                        self.hdf_raw.attributes())
+                            with open("{}.csv".format(base_dr[:-1]), 'a') as f_info:
+                                f_info.write(self.hdf_info)
+
                             print("plotting histogram {}".format(self.fullname))
                             self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
                                                                               DATAFIELD_NAME, Dataset_DOI)

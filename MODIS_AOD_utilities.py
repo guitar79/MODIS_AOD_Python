@@ -141,7 +141,7 @@ def draw_histogram_hdf(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME,
     plt.figure(figsize=(10, 10))
     plt.title("Histogram of {0}".format(DATAFIELD_NAME), fontsize=20, pad=30)
     plt.annotate(
-        "value mean: {0:.02f}, min: {1:.02f} max: {2:.02f}, \nlongigude : {3:.02f}~{4:.02f}\nlatitude: {5:.02f}~{6:.02f}". \
+        "value mean: {0:.03f}, min: {1:.03f} max: {2:.03f}, \nlongigude : {3:.03f}~{4:.03f}\nlatitude: {5:.03f}~{6:.03f}". \
         format(np.nanmean(hdf_value), np.nanmin(hdf_value), np.nanmax(hdf_value), \
                Wlon, Elon, Slat, Nlat,),
         xy=(0, 0), xytext=(0, -28), va='top', ha='left',
@@ -188,7 +188,7 @@ def draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIE
     Wlon, Elon, Slat, Nlat, Clon, Clat = findRangeOfMap(longitude, latitude)
     # map
     m = Basemap(projection='laea', lat_ts=Clat, lat_0=Clat, lon_0=Clon, \
-                width=0.25e7, height=0.25e7, resolution="i")
+                width=0.4e7, height=0.4e7, resolution="i")
 
     # draw & fill
     m.drawcoastlines(linewidth=0.25)
@@ -206,7 +206,7 @@ def draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIE
     # set title and annotate
     plt.title('MODIS {}'.format(DATAFIELD_NAME), fontsize=20, pad=30)
 
-    plt.annotate("Maximun value: {0:.1f}\nMean value: {1:.1f}\nMin value: {2:.1f}" \
+    plt.annotate("Maximun value: {0:.3f}\nMean value: {1:.3f}\nMin value: {2:.3f}" \
                  .format(np.nanmax(hdf_value), np.nanmean(hdf_value), np.nanmin(hdf_value)),
                  xy=(0, 0), xytext=(0, -28), va='top', ha='left',
                  xycoords='axes fraction', textcoords='offset points')

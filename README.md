@@ -53,6 +53,7 @@ conda install -c conda-forge basemap
 conda install -c conda-forge basemap-data-hires
 conda install -c conda-forge spyder
 conda install -c conda-forge matplotlib==3.2
+conda install -c conda-forge netCDF4
 #pip install cartopy
 
 # 가상환경 내보내기 (export)
