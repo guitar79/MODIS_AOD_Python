@@ -2,108 +2,111 @@
 # -*- coding: utf-8 -*-
 '''
 #############################################################
-#runfile('./A1.daily_classify_from_DAAC_MOD04_3K_hdf.py', '0.1 2019', wdir='./')
+#runfile('./A2.daily_classify_from_DAAC_MOD04_3K_hdf.py', '0.1 2019', wdir='./')
 #cd '/mnt/14TB1/RS-data/KOSC/MODIS_AOD_Python' && for yr in {2011..2020}; do python classify_AVHRR_asc_SST-01.py daily 0.05 $yr; done
 #conda activate MODIS_hdf_Python_env && cd '/mnt/14TB1/RS-data/KOSC/MODIS_AOD_Python' && python classify_AVHRR_asc_SST.py daily 0.01 2011
-#conda activate MODIS_hdf_Python_env && cd /mnt/Rdata/RS-data/KOSC/MODIS_AOD_Python/ && A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 1.0 2019
-#conda activate MODIS_hdf_Python_env && cd /mnt/6TB1/RS_data/MODIS_AOD/MODIS_AOD_Python/ && python A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2000
-#conda activate MODIS_hdf_Python_env && cd /mnt/MODIS_AOD/MODIS_AOD_Python/ && python A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2002
-#conda activate MODIS_AOD_Python_env && cd /mnt/MODIS_AOD/MODIS_AOD_Python/ && for yr in {2000..2020}; do python A1.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 $yr; done
+#conda activate MODIS_hdf_Python_env && cd /mnt/Rdata/RS-data/KOSC/MODIS_AOD_Python/ && A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 1.0 2019
+#conda activate MODIS_hdf_Python_env && cd /mnt/6TB1/RS_data/MODIS_AOD/MODIS_AOD_Python/ && python A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2000
+#conda activate MODIS_hdf_Python_env && cd /mnt/MODIS_AOD/MODIS_AOD_Python/ && python A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2002
+#conda activate MODIS_AOD_Python_env && cd /mnt/MODIS_AOD/MODIS_AOD_Python/ && for yr in {2000..2020}; do python A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 $yr; done
 '''
 
-from datetime import datetime
-import numpy as np
 import os
 import sys
+
+import re
+
+import numpy as np
+import pandas as pd
+from datetime import datetime
 import MODIS_AOD_utilities
+import Python_utilities
 
-arg_mode = True
-#arg_mode =  False
+#threading library
+from queue import Queue
+import threading
 
-log_file = os.path.basename(__file__)[:-3]+".log"
-err_log_file = os.path.basename(__file__)[:-3]+"_err.log"
+#########################################
+log_dir = "logs/"
+log_file = "{}{}.log".format(log_dir, os.path.basename(__file__)[:-3])
+err_log_file = "{}{}_err.log".format(log_dir, os.path.basename(__file__)[:-3])
 print ("log_file: {}".format(log_file))
 print ("err_log_file: {}".format(err_log_file))
 
-if arg_mode == True :
-    from sys import argv # input option
-    print("argv: {}".format(argv))
+#########################################
+# Set variables
+#########################################
+base_dr = "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"
+Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MOD04_L2.006"
+base_dr = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/"
+Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
 
-    if len(argv) < 2 :
-        print ("Please input L3_perid and year \n ex) aaa.py 0.1 2016")
-        sys.exit()
-    elif len(argv) > 3 :
-        print ("Please input L3_perid and year \n ex) aaa.py 0.1 2016")
-        sys.exit()
-    else :
-        resolution, year = float(argv[1]), int(argv[2])
-        #print("{}, {}, processing started...".format(argv[1], argv[2]))
-else :
-    resolution, year = 0.5, 2000
-
-print("{}, {}, processing started...".format(resolution, year))
+base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
+              "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"]
 
 # Set Datafield name
 DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
+resolution = 0.01
 
 #Set lon, lat, resolution
-Llon, Rlon = 110, 150
-Slat, Nlat = 10, 60
+Llon, Rlon, Slat, Nlat = 110, 150, 10, 60
 
-#set directory
-#base_dir_name = "../DAAC_MOD04_3K/"
-base_dir_names = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/", 
-                  "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"]
-save_dir_name = "../L3_{0}/{0}_{1}_{2}_{3}_{4}_{5}_{6}/".format(DATAFIELD_NAME, str(Llon), str(Rlon),
+save_dr = "../L3_{0}/{0}_{1}_{2}_{3}_{4}_{5}_{6}/".format(DATAFIELD_NAME, str(Llon), str(Rlon),
                                                         str(Slat), str(Nlat), str(resolution), "date")
-if not os.path.exists(save_dir_name):
-    os.makedirs(save_dir_name)
+
+#########################################  
+
+if not os.path.exists(save_dr):
+    os.makedirs(save_dr)
     print ('*'*80)
-    print ("{} is created...".format(save_dir_name))
+    print ("{} is created...".format(save_dr))
 else :
     print ('*'*80)
-    print ("{} is already exist...".format(save_dir_name))
+    print ("{} is already exist...".format(save_dr))
 
-proc_dates = []
-
-#make processing period tuple
-from dateutil.relativedelta import relativedelta
-s_start_date = datetime(year, 1, 1) #convert startdate to date type
-s_end_date = datetime(year+1, 1, 1)
-
-k=0
-date1 = s_start_date
-date2 = s_start_date
-
-while date2 < s_end_date :
-    k += 1
-    date2 = date1 + relativedelta(days=1)
-    date = (date1, date2, k)
-    proc_dates.append(date)
-    date1 = date2
 
 fullnames = []
-for dirName in base_dir_names :
+for dirName in base_drs :
+    #dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
     try :
-        fullnames.extend(MODIS_hdf_utilities.getFullnameListOfallFiles("{}{}/".format(dirName, str(year))))
+        fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
     except Exception as err :
-        #MODIS_hdf_utilities.write_log(err_log_file, err)
+        #Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
-import pandas as pd 
+fullnames = sorted(fullnames)
 df = pd.DataFrame({'fullname':fullnames})
 
 df = df[df.fullname.str.contains(".hdf")]
 
 for idx, row in df.iterrows():
     print(row["fullname"])
-    df.at[idx, "fullname_dt"] = MODIS_hdf_utilities.fullname_to_datetime_for_DAAC3K(df.loc[idx, "fullname"])   
+    #df.at[idx, "fullname_dt"] = MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.loc[idx, "fullname"])
+    df["fullname_dt"] = MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.fullname.str)
 
 df.index = df['fullname_dt']
 print("df:\n{}".format(df))
 
+#########################################
+proc_dates = []
+#make processing period tuple
+from dateutil.relativedelta import relativedelta
+set_S_datetime = datetime(2000, 6, 1) #convert startdate to date type
+set_E_datetime = datetime(2022, 1, 1)
+
+date1 = set_S_datetime
+date2 = set_S_datetime
+
+while date2 < set_E_datetime :
+    date2 = date1 + relativedelta(days=1)
+    dates = (date1, date2)
+    proc_dates.append(dates)
+    date1 = date2
+
+print("len(proc_dates): {}".format(len(proc_dates)))
+#########################################
+
 created_file_NO = 0
-#proc_date = proc_dates[0]
 for proc_date in proc_dates[:]:
     #proc_date = proc_dates[0]
     print("Starting process data in {0} - {1} ...\n"\
@@ -112,14 +115,14 @@ for proc_date in proc_dates[:]:
     
     #check file exist??
     if os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy'\
-            .format(save_dir_name, DATAFIELD_NAME, proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'), 
+            .format(save_dr, DATAFIELD_NAME, proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'), 
             str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))\
         and os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.txt'\
-            .format(save_dir_name, DATAFIELD_NAME, proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'), 
+            .format(save_dr, DATAFIELD_NAME, proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'), 
             str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))) :
             
         print(('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are exist...'
-            .format(save_dir_name, DATAFIELD_NAME, proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'), 
+            .format(save_dr, DATAFIELD_NAME, proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'), 
             str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))))
     
     else : 
@@ -142,7 +145,7 @@ for proc_date in proc_dates[:]:
             # make array_data
             print("{0}-{1} Start making grid arrays...\n".\
                   format(proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d')))
-            array_data = MODIS_hdf_utilities.make_grid_array(Llon, Rlon, Slat, Nlat, resolution)            
+            array_data = MODIS_AOD_utilities.make_grid_array(Llon, Rlon, Slat, Nlat, resolution)
             print('Grid arrays are created...........\n')
         
             total_data_cnt = 0
@@ -161,7 +164,7 @@ for proc_date in proc_dates[:]:
             
                 try : 
                     hdf_raw, latitude, longitude, cntl_pt_cols, cntl_pt_rows \
-                        = MODIS_hdf_utilities.read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME)
+                        = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME)
                         
                     hdf_value = hdf_raw[:,:]
                     
@@ -358,7 +361,7 @@ for proc_date in proc_dates[:]:
                                     np.nanmax(latitude), np.nanmin(latitude), str(hdf_raw.attributes()))
             
                 except Exception as err :
-                    #MODIS_hdf_utilities.write_log(err_log_file, err)
+                    #Python_utilities.write_log(err_log_file, err)
                     print(err)
                     continue
 
@@ -375,19 +378,19 @@ for proc_date in proc_dates[:]:
                 print("array_alldata.size == 0")
             else :
                 np.save('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
-                        .format(save_dir_name, DATAFIELD_NAME,
+                        .format(save_dr, DATAFIELD_NAME,
                         proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),
                         str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), array_alldata)
             
                 with open('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.txt' \
-                        .format(save_dir_name, DATAFIELD_NAME,
+                        .format(save_dr, DATAFIELD_NAME,
                         proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),
                         str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), 'w') as f:
                     f.write(processing_log)
             
             print('#' * 60)
-            MODIS_hdf_utilities.write_log(log_file,
+            Python_utilities.write_log(log_file,
                 '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are is created.\n{9} files are finished...' \
-                .format(save_dir_name, DATAFIELD_NAME,
+                .format(save_dr, DATAFIELD_NAME,
                 proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),
                 str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution), str(created_file_NO)))

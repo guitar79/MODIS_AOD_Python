@@ -127,6 +127,7 @@ dependencies:
   - olefile=0.46=pyh9f0ad1d_1
   - openssl=1.1.1m=h7f8727e_0
   - packaging=21.3=pyhd8ed1ab_0
+  - pandas=1.2.3=py38h51da96c_0
   - pandoc=2.17.1.1=ha770c72_0
   - pandocfilters=1.5.0=pyhd8ed1ab_0
   - parso=0.8.3=pyhd8ed1ab_0
