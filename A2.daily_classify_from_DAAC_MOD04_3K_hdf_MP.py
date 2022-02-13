@@ -16,6 +16,44 @@ from datetime import datetime
 import threading
 import sys
 
+
+#########################################
+# I love the OOP way.(Custom class for multiprocessing)
+import multiprocessing as proc
+myQueue = proc.Manager().Queue()
+class Multiprocessor():
+    def __init__(self):
+        self.processes = []
+        self.queue = proc.Queue()
+
+    @staticmethod
+    def _wrapper(func, args, kwargs):
+        ret = func(*args, **kwargs)
+        myQueue.put(ret)
+
+    def restart(self):
+        self.processes = []
+        self.queue = proc.Queue()
+
+    def run(self, func, *args, **kwargs):
+        args2 = [func, args, kwargs]
+		#print(".run(args2):{}".format(args2))
+        p = proc.Process(target=self._wrapper, args=args2)
+        self.processes.append(p)
+        p.start()
+
+    def wait(self):
+        for p in self.processes:
+            p.join()
+        rets = []
+        for p in self.processes:
+            ret = myQueue.get_nowait()
+            rets.append(ret)
+        for p in self.processes:
+            p.terminate()
+        return rets    
+
+
 #########################################
 log_dir = "logs/"
 log_file = "{}{}.log".format(log_dir, os.path.basename(__file__)[:-3])
@@ -33,7 +71,7 @@ print ("err_log_file: {}".format(err_log_file))
 
 base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
               "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"]
-#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
+base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
 
 # Set Datafield name
 DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
@@ -393,15 +431,21 @@ while date2 < set_E_datetime :
 print("len(proc_dates): {}".format(len(proc_dates)))
 #########################################
 
-threadno = 1
+myMP = Multiprocessor()
+num_cpu = 8
+values = []
+num_batches = len(proc_dates) // num_cpu + 1
 
-num_thread = 20
-num_batches = len(proc_dates) // num_thread + 1
-
+threadno = 0
 for batch in range(num_batches):
-	#for working_Ho in working_datetimes :
-	#mergeunit = merge_unit(working_Ho, threadno)
-	Classifyunit = Classify_unit(proc_dates[batch*num_batches:(batch+1)*num_batches], threadno)
-	#merger.daemon = True
-	Classifyunit.start()
-	threadno += 1
+    myMP.restart()
+    for proc_date in proc_dates[batch*num_batches:(batch+1)*num_batches]:
+        # myMP.run(merger_day, working_Ho, threadno)
+        fetcher = Classifier(proc_date, threadno)
+        #fetcher.fetch()
+        myMP.run(fetcher.fetch())
+        threadno += 1
+    print("Batch " + str(batch))
+    myMP.wait()
+    values.append(myMP.wait())
+    print("OK batch" + str(batch))
