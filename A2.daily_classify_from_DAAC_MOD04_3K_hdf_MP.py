@@ -409,7 +409,7 @@ print("len(proc_dates): {}".format(len(proc_dates)))
 #########################################
 
 myMP = Multiprocessor()
-num_cpu = 4
+num_cpu = 16
 values = []
 num_batches = len(proc_dates) // num_cpu + 1
 
