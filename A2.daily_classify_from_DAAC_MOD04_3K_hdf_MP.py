@@ -16,42 +16,37 @@ from datetime import datetime
 import threading
 import sys
 
-
 #########################################
-# I love the OOP way.(Custom class for multiprocessing)
-import multiprocessing as proc
-myQueue = proc.Manager().Queue()
+from multiprocessing import Process, Queue
+
 class Multiprocessor():
-    def __init__(self):
-        self.processes = []
-        self.queue = proc.Queue()
+	def __init__(self):
+		self.processes = []
+		self.queue = Queue()
 
-    @staticmethod
-    def _wrapper(func, args, kwargs):
-        ret = func(*args, **kwargs)
-        myQueue.put(ret)
+	@staticmethod
+	def _wrapper(func, queue, args, kwargs):
+		ret = func(*args, **kwargs)
+		queue.put(ret)
 
-    def restart(self):
-        self.processes = []
-        self.queue = proc.Queue()
+	def restart(self):
+		self.processes = []
+		self.queue = Queue()
 
-    def run(self, func, *args, **kwargs):
-        args2 = [func, args, kwargs]
-		#print(".run(args2):{}".format(args2))
-        p = proc.Process(target=self._wrapper, args=args2)
-        self.processes.append(p)
-        p.start()
+	def run(self, func, *args, **kwargs):
+		args2 = [func, self.queue, args, kwargs]
+		p = Process(target=self._wrapper, args=args2)
+		self.processes.append(p)
+		p.start()
 
-    def wait(self):
-        for p in self.processes:
-            p.join()
-        rets = []
-        for p in self.processes:
-            ret = myQueue.get_nowait()
-            rets.append(ret)
-        for p in self.processes:
-            p.terminate()
-        return rets    
+	def wait(self):
+		rets = []
+		for p in self.processes:
+			ret = self.queue.get()
+			rets.append(ret)
+		for p in self.processes:
+			p.join()
+		return rets
 
 
 #########################################
@@ -71,7 +66,9 @@ print ("err_log_file: {}".format(err_log_file))
 
 base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
               "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"]
-base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
+#base_drs = ["../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
+#              "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
+#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
 
 # Set Datafield name
 DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
@@ -98,10 +95,10 @@ else :
 #single thread class
 #########################################
 class Classifier():
-    def __init__(self, proc_date, threadno):
+    def __init__(self, proc_date):
         self.proc_date = proc_date
-        self.threadno = threadno
-    def fetch(self):
+        
+    #def fetch(self):
         print("Starting process data in {0} - {1} ...\n" \
               .format(self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d')))
         self.df_proc = df[(df['fullname_dt'] >= self.proc_date[0]) & (df['fullname_dt'] < self.proc_date[1])]
@@ -372,22 +369,6 @@ class Classifier():
                             .format(save_dr, DATAFIELD_NAME,
                             self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
                             str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
-                sys.stderr.write("Thread #%d failed...retry\n" % self.threadno)
-
-class Classify_unit(threading.Thread):
-    # def __init__(self, working_Date, threadno):
-    def __init__(self, proc_dates, threadno):
-        threading.Thread.__init__(self)
-        self.proc_dates = proc_dates
-        # self.working_Date = working_Date
-        self.threadno = threadno
-        sys.stderr.write('Thread #{} started...\n'.format(self.threadno))
-
-    def run(self):
-        for self.proc_date in self.proc_dates:
-            fetcher = Classifier(self.proc_date, self.threadno)
-            fetcher.fetch()
-            sys.stderr.write('Thread #{} - fetched {}...\n'.format(self.threadno, self.proc_date))
 
 fullnames = []
 for dirName in base_drs :
@@ -432,19 +413,15 @@ print("len(proc_dates): {}".format(len(proc_dates)))
 #########################################
 
 myMP = Multiprocessor()
-num_cpu = 8
+num_cpu = 4
 values = []
 num_batches = len(proc_dates) // num_cpu + 1
 
-threadno = 0
 for batch in range(num_batches):
     myMP.restart()
     for proc_date in proc_dates[batch*num_batches:(batch+1)*num_batches]:
-        # myMP.run(merger_day, working_Ho, threadno)
-        fetcher = Classifier(proc_date, threadno)
-        #fetcher.fetch()
-        myMP.run(fetcher.fetch())
-        threadno += 1
+        myMP.run(Classifier, proc_date)
+
     print("Batch " + str(batch))
     myMP.wait()
     values.append(myMP.wait())
