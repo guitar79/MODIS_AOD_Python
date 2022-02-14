@@ -225,8 +225,10 @@ def findRangeOfMap(longitude, latitude):
 
     Slat = np.nanmin(latitude180) - 90
     Nlat = np.nanmax(latitude180) - 90
-    Clon = ((np.nanmax(longitude360) + np.nanmin(longitude360)) / 2) - 180
-    Clat = ((np.nanmax(latitude180) + np.nanmin(latitude180)) / 2) - 90
+    #Clon = ((np.nanmax(longitude360) + np.nanmin(longitude360)) / 2) - 180
+    #Clat = ((np.nanmax(latitude180) + np.nanmin(latitude180)) / 2) - 90
+    Clon = longitude[int(longitude.shape[0]/2), int(longitude.shape[1]/2)]
+    Clat = latitude[int(longitude.shape[0]/2), int(longitude.shape[1]/2)]
     if np.nanmax(longitude) - np.nanmax(longitude) > 180 :
         Wlon = np.nanmax(longitude360) - 180
         Elon = np.nanmin(longitude360) - 180

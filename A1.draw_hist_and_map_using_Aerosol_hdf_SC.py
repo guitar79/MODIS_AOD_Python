@@ -67,8 +67,8 @@ class Plotter():
                     self.filename_el = self.fullname_el[-1].split(".")
                     self.save_dr = self.fullname[:-len(self.fullname_el[-1])]
 
-                    if os.path.exists("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]))\
-                        and os.path.exists("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4])):
+                    if False and (os.path.exists("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]))\
+                        and os.path.exists("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4]))):
                         print("{0}{1}_map.png and {0}{1}_hist.png are already exist...".format(self.save_dr, self.fullname_el[-1][:-4]))
                     else:
                         print("Reading hdf file {0}\n".format(self.fullname))
