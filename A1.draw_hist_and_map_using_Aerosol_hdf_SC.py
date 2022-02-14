@@ -34,8 +34,8 @@ print ("err_log_file: {}".format(err_log_file))
 #set directory
 base_dr = "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"
 Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MOD04_L2.006"
-base_dr = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/"
-Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
+#base_dr = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/"
+#Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
 
 # Set Datafield name
 DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
