@@ -168,7 +168,7 @@ class Plotter():
                                 continue
         except Exception as err:
             sys.stderr.write("Thread #%d failed...retry\n" % self.threadno)
-            continue
+            pass
 
 class plot_unit(threading.Thread):
         # def __init__(self, working_Date, threadno):

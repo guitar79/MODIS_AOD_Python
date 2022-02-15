@@ -62,8 +62,8 @@ print ("err_log_file: {}".format(err_log_file))
 
 base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
               "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"]
-#base_drs = ["../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
-#              "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
+base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 10km/",
+              "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
 #base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
 
 # Set Datafield name
@@ -74,7 +74,7 @@ resolution = 0.01
 Llon, Rlon, Slat, Nlat = 110, 150, 10, 60
 
 save_dr = "../L3_{0}/{0}_{1}_{2}_{3}_{4}_{5}_{6}/".format(DATAFIELD_NAME, str(Llon), str(Rlon),
-                                                        str(Slat), str(Nlat), str(resolution), "date_3K")
+                                                        str(Slat), str(Nlat), str(resolution), "date_10K")
 
 #########################################  
 
@@ -296,7 +296,7 @@ class Classifier():
 
                         if np.isnan(self.hdf_value).all():
                             self.processing_log += "{0}, 0, 0, {1}, \n" \
-                                .format(str(self.file_no), str(self.fullname))
+                                .format(str(self.file_no), str(self.filenameel[-1]))
                             print("There is no hdf data...")
                             # print("(np.isnan(self.hdf_value).all()) is true...")
 
@@ -393,7 +393,7 @@ print("make datetime column in df:\n{}".format(df))
 proc_dates = []
 #make processing period tuple
 from dateutil.relativedelta import relativedelta
-set_S_datetime = datetime(2010, 1, 1) #convert startdate to date type
+set_S_datetime = datetime(2001, 1, 1) #convert startdate to date type
 set_E_datetime = datetime(2022, 1, 1)
 
 date1 = set_S_datetime
@@ -409,7 +409,7 @@ print("len(proc_dates): {}".format(len(proc_dates)))
 #########################################
 
 myMP = Multiprocessor()
-num_cpu = 16
+num_cpu = 14
 values = []
 num_batches = len(proc_dates) // num_cpu + 1
 
