@@ -38,7 +38,7 @@ base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
-base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
+#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/001/"]
 
 # Set Datafield name
 DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
@@ -67,7 +67,7 @@ class Plotter():
                 print("Reading hdf file {0}\n".format(self.fullname))
                 try:
                     self.hdf_raw, self.latitude, self.longitude, self.cntl_pt_cols, self.cntl_pt_rows \
-                        = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
+                            = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
                     self.hdf_value = self.hdf_raw[:, :]
                     if 'bad_value_scaled' in self.hdf_raw.attributes():
                         # hdf_value[hdf_value == hdf_raw.attributes()['bad_value_scaled']] = np.nan
@@ -120,11 +120,14 @@ class Plotter():
 
                     self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
                     #filename, Wlon, Elon, Slat, Nlat, mean(hdf_value), min(hdf_value), max(hdf_value), hdf_raw.attributes()
-                    self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}\n".format(self.fullname_el[-1], self.Wlon, self.Elon, self.Slat, self.Nlat,
-                                                                np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
-                                                                self.hdf_raw.attributes())
-                    with open("{}.csv".format(self.filename[:self.filename.find(self.filename_el[2])], 'a') as f_info:
+                    self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}\n".format(self.fullname_el[-1],
+                            self.Wlon, self.Elon, self.Slat, self.Nlat,
+                            np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
+                            self.hdf_raw.attributes())
+                    print("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]))
+                    with open("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]), 'a') as f_info:
                         f_info.write(self.hdf_info)
+                        print("added {}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3]) - 1)]))
 
                     print("plotting histogram {}".format(self.fullname))
                     self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
@@ -133,7 +136,7 @@ class Plotter():
                     self.plt_hist.close()
                     ######################################################################################
                     Python_utilities.write_log(log_file,
-                                                  "{}{}_hist.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
+                            "{}{}_hist.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
                     # Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
                     print("plotting on the map {}".format(self.fullname))
@@ -142,13 +145,12 @@ class Plotter():
                     self.plt_map.savefig("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
                     self.plt_map.close()
                     ######################################################################################
-
                     Python_utilities.write_log(log_file,
-                                                  "{}{}_map.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
+                            "{}{}_map.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
                 except Exception as err:
                     Python_utilities.write_log(err_log_file,
-                           "{}, error: {}".format(self.fullname_el[-1], err))
+                            "{}, error: {}".format(self.fullname_el[-1], err))
 
 fullnames = []
 for dirName in base_drs :
