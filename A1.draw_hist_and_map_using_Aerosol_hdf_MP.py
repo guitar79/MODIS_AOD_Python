@@ -196,7 +196,7 @@ print(working_datetimes)
 #########################################
 
 myMP = Multiprocessor()
-num_cpu = 14
+num_cpu = 2
 values = []
 num_batches = len(working_datetimes) // num_cpu + 1
 
