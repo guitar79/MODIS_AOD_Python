@@ -52,7 +52,6 @@ class Plotter():
         self.fullname = fullname
 
     #@def fetch(self):
-
         if self.fullname[-4:].lower() == ".hdf":
 
             print("Starting...   self.fullname: {}".format(self.fullname))
@@ -124,7 +123,7 @@ class Plotter():
                     self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}\n".format(self.fullname_el[-1], self.Wlon, self.Elon, self.Slat, self.Nlat,
                                                                 np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
                                                                 self.hdf_raw.attributes())
-                    with open("{}.csv".format(base_dr[:-1]), 'a') as f_info:
+                    with open("{}.csv".format(self.filename[:self.filename.find(self.filename_el[2])], 'a') as f_info:
                         f_info.write(self.hdf_info)
 
                     print("plotting histogram {}".format(self.fullname))
