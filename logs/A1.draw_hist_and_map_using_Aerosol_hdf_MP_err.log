@@ -4,3 +4,11 @@
 [2022-02-16 18:24:38] MYD04_3K.A2017001.0215.061.2018029074835.hdf, error: autodetected range of [nan, nan] is not finite
 [2022-02-16 18:25:31] MYD04_3K.A2017001.0705.061.2018029075314.hdf, error: 'vertices' must be a 2D list or array with shape Nx2
 [2022-02-16 18:25:45] MYD04_3K.A2017001.0000.061.2018029075408.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 18:38:05] MYD04_3K.A2017001.0125.061.2018029075307.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 18:38:05] MYD04_3K.A2017001.0800.061.2018029074927.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 18:38:05] MYD04_3K.A2017001.0810.061.2018029074846.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 18:38:05] MYD04_3K.A2017001.0355.061.2018029075041.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 18:38:06] MYD04_3K.A2017001.0710.061.2018029074709.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 18:38:06] MYD04_3K.A2017001.0215.061.2018029074835.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 18:38:06] MYD04_3K.A2017001.0445.061.2018029074448.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 18:38:06] MYD04_3K.A2017001.0625.061.2018029075450.hdf, error: autodetected range of [nan, nan] is not finite

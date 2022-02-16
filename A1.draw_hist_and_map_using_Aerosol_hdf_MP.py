@@ -62,7 +62,7 @@ base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 10km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
-base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2017/001/"]
+#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2017/001/"]
 Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
 
 # Set Datafield name
@@ -190,7 +190,7 @@ fullnames = sorted(fullnames)
 #########################################
 
 myMP = Multiprocessor()
-num_cpu = 2
+num_cpu = 10
 values = []
 num_batches = len(fullnames) // num_cpu + 1
 
