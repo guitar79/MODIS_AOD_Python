@@ -1237,3 +1237,61 @@
 [2022-02-16 18:19:39] MYD04_3K.A2016001.0455.061.2018059010200.hdf, error: [Errno 2] No such file or directory: "'../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km.csv'"
 [2022-02-16 18:19:40] MYD04_3K.A2016001.0500.061.2018059010029.hdf, error: [Errno 2] No such file or directory: "'../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km.csv'"
 [2022-02-16 18:19:40] MYD04_3K.A2016001.0505.061.2018059010217.hdf, error: [Errno 2] No such file or directory: "'../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km.csv'"
+[2022-02-16 19:31:22] MYD04_3K.A2002185.0220.061.2018003214838.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:31:23] MYD04_3K.A2002185.0400.061.2018003214333.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:31:23] MYD04_3K.A2002185.0450.061.2018003214248.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:31:34] MYD04_3K.A2002185.0555.061.2018003214341.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:31:45] MYD04_3K.A2002185.0600.061.2018003214357.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:31:46] MYD04_3K.A2002185.0630.061.2018003214302.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:31:59] MYD04_3K.A2002185.0755.061.2018003214627.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:32:07] MYD04_3K.A2002185.0800.061.2018003214342.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:32:07] MYD04_3K.A2002185.1035.061.2018003214018.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:32:08] MYD04_3K.A2002185.1305.061.2018003214020.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:32:15] MYD04_3K.A2002185.1355.061.2018003214237.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:32:22] MYD04_3K.A2002185.1400.061.2018003214202.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:32:31] MYD04_3K.A2002185.1555.061.2018003214055.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:32:40] MYD04_3K.A2002185.1600.061.2018003214023.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:32:40] MYD04_3K.A2002185.1710.061.2018003214210.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:32:50] MYD04_3K.A2002185.1720.061.2018003214011.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:32:57] MYD04_3K.A2002185.1755.061.2018003214241.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:33:08] MYD04_3K.A2002185.1800.061.2018003214206.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:33:08] MYD04_3K.A2002185.1850.061.2018003214208.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:33:09] MYD04_3K.A2002185.1940.061.2018003213922.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:33:09] MYD04_3K.A2002185.2120.061.2018003213955.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:33:17] MYD04_3K.A2002185.2355.061.2018003214352.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:33:24] MYD04_3K.A2002186.0000.061.2018003215121.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:33:24] MYD04_3K.A2002186.0125.061.2018003213743.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:33:34] MYD04_3K.A2002186.0155.061.2018003213954.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:33:43] MYD04_3K.A2002186.0200.061.2018003213934.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:33:44] MYD04_3K.A2002186.0355.061.2018003214227.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:33:44] MYD04_3K.A2002186.0800.061.2018003213526.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:33:45] MYD04_3K.A2002186.0940.061.2018003213754.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:33:53] MYD04_3K.A2002186.0955.061.2018003213853.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:34:02] MYD04_3K.A2002186.1000.061.2018003213918.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:34:03] MYD04_3K.A2002186.1030.061.2018003213630.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:34:17] MYD04_3K.A2002186.1155.061.2018003213912.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:34:25] MYD04_3K.A2002186.1200.061.2018003213748.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:34:25] MYD04_3K.A2002186.1210.061.2018003213650.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:34:33] MYD04_3K.A2002186.1450.061.2018003213814.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:34:33] MYD04_3K.A2002186.1615.061.2018003213755.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:34:34] MYD04_3K.A2002186.1705.061.2018003213447.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:34:43] MYD04_3K.A2002186.1755.061.2018003213537.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:34:52] MYD04_3K.A2002186.1800.061.2018003213647.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:34:53] MYD04_3K.A2002186.1845.061.2018003213636.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:35:02] MYD04_3K.A2002186.1955.061.2018003213704.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:35:12] MYD04_3K.A2002186.2000.061.2018003213842.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:35:20] MYD04_3K.A2002186.2155.061.2018003213656.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:35:32] MYD04_3K.A2002186.2200.061.2018003213448.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:35:32] MYD04_3K.A2002186.2250.061.2018003213535.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:35:33] MYD04_3K.A2002187.0030.061.2018003214429.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:35:33] MYD04_3K.A2002187.0120.061.2018003214550.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:35:33] MYD04_3K.A2002187.0300.061.2018003214809.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:35:41] MYD04_3K.A2002187.0355.061.2018003214719.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:35:50] MYD04_3K.A2002187.0400.061.2018003214827.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:36:01] MYD04_3K.A2002187.0555.061.2018003214804.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:36:11] MYD04_3K.A2002187.0600.061.2018003214738.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:36:12] MYD04_3K.A2002187.0705.061.2018003214656.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:36:30] MYD04_3K.A2002187.0755.061.2018003214651.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-16 19:36:30] MYD04_3K.A2002187.0935.061.2018003214746.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:36:31] MYD04_3K.A2002187.1340.061.2018003214908.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-16 19:36:40] MYD04_3K.A2002187.1355.061.2018003215133.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
