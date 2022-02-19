@@ -12,7 +12,6 @@ from datetime import datetime
 # =============================================================================
 # creat log
 # =============================================================================
-
 def write_log(log_file, log_str):
     import time
     timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -40,6 +39,25 @@ master_file_dir_name = 'master_file_Python/'
 processing_dir_name = 'processing_Python/'
 integration_dir_name = 'integration_Python/'
 alignment_dir_name = 'alignment_Python/'
+
+
+# =============================================================================
+# getFullnameListOfallFiles
+# =============================================================================
+def create_connection(db_file):
+    import sqlite3
+    from sqlite3 import Error
+    """ create a database connection to the SQLite database
+        specified by the db_file
+    :param db_file: database file
+    :return: Connection object or None
+    """
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
+    return None
 
 
 # =============================================================================

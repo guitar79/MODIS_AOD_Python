@@ -2,18 +2,46 @@
 # -*- coding: utf-8 -*-
 '''
 #############################################################
-#runfile('./classify_AVHRR_asc_SST-01.py', 'daily 0.1 2019', wdir='./MODIS_hdf_Python/')
-#cd '/mnt/14TB1/RS-data/KOSC/MODIS_hdf_Python' && for yr in {2011..2020}; do python classify_AVHRR_asc_SST-01.py daily 0.05 $yr; done
-#conda activate MODIS_hdf_Python_env && cd '/mnt/14TB1/RS-data/KOSC/MODIS_hdf_Python' && python classify_AVHRR_asc_SST.py daily 0.01 2011
-#conda activate MODIS_hdf_Python_env && cd /mnt/Rdata/RS-data/KOSC/MODIS_hdf_Python/ && A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 1.0 2019
-#conda activate MODIS_hdf_Python_env && cd /mnt/6TB1/RS_data/MODIS_AOD/MODIS_hdf_Python/ && python A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2000
+
 '''
 
-from glob import glob
 import numpy as np
 import os
 import MODIS_AOD_utilities
 import Python_utilities
+from datetime import datetime
+
+#########################################
+from multiprocessing import Process, Queue
+
+class Multiprocessor():
+    def __init__(self):
+        self.processes = []
+        self.queue = Queue()
+
+    @staticmethod
+    def _wrapper(func, queue, args, kwargs):
+        ret = func(*args, **kwargs)
+        queue.put(ret)
+
+    def restart(self):
+        self.processes = []
+        self.queue = Queue()
+
+    def run(self, func, *args, **kwargs):
+        args2 = [func, self.queue, args, kwargs]
+        p = Process(target=self._wrapper, args=args2)
+        self.processes.append(p)
+        p.start()
+
+    def wait(self):
+        rets = []
+        for p in self.processes:
+            ret = self.queue.get()
+            rets.append(ret)
+        for p in self.processes:
+            p.join()
+        return rets
 
 #########################################
 log_dir = "logs/"
@@ -27,131 +55,151 @@ print ("err_log_file: {}".format(err_log_file))
 #########################################
 #set directory
 base_dr = "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"
-Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MOD04_L2.006"
 base_dr = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/"
+base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
+            "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/",
+            "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 10km/",
+            "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
+
+#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2017/001/"]
 Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
 
 # Set Datafield name
 DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
-
-#########################################
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-set_S_datetime = datetime(2003, 1, 1) #convert startdate to date type
-set_E_datetime = datetime(2021, 12, 31)
-
-working_Datetetimes = [set_S_datetime.strftime("%Y-%m-%d")]
-date1 = set_S_datetime
-while date1 < set_E_datetime :
-    date1 += relativedelta(months=1)
-    working_Datetetimes.append(date1.strftime("%Y-%m-%d"))
-print(working_Datetetimes)
 #########################################
 
-n = 0
-for working_Date in working_Datetetimes[:]:
-    #working_Date = working_Datetetimes[0]
-    working_Jday = MODIS_AOD_utilities.datestr_to_JDay(working_Date, "%Y-%m-%d")
-    working_Date = datetime.strptime(working_Date, "%Y-%m-%d")
+#########################################
+#single  class
+#########################################
+class Plotter():
+    def __init__(self, fullname):
+        self.fullname = fullname
 
-    n += 1
-    print('#' * 60,
-          "\n{2:.01f}%  ({0}/{1}) {3}".format(n, len(working_Datetetimes), (n / len(working_Datetetimes)) * 100,
-                                              os.path.basename(__file__)))
-    print("Starting...   working_Date: {}".format(working_Date))
+    #@def fetch(self):
+        if self.fullname[-4:].lower() == ".hdf":
 
-    # get fullnames
-    fullnames = Python_utilities.getFullnameListOfallFiles("{}{}".format(base_dr, working_Date.strftime("%Y/")))
-    #fullnames = sorted(
-    #    glob(os.path.join("{}{}{}/".format(base_dr, working_Date.strftime("%Y/"), working_Jday), '*.hdf')))
+            print("Starting...   self.fullname: {}".format(self.fullname))
+            self.fullname_el = self.fullname.split("/")
+            self.filename_el = self.fullname_el[-1].split(".")
+            self.save_dr = self.fullname[:-len(self.fullname_el[-1])]
 
-    nn = 0
+            #if False and (os.path.exists("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4])) \
+            if (os.path.exists("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4])) \
+                    and os.path.exists("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4]))):
+                print("{0}{1}_map.png and {0}{1}_hist.png are already exist...".format(self.save_dr, self.fullname_el[-1][:-4]))
+            else:
+                print("Reading hdf file {0}\n".format(self.fullname))
+                try:
+                    self.hdf_raw, self.latitude, self.longitude, self.cntl_pt_cols, self.cntl_pt_rows \
+                            = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
+                    self.hdf_value = self.hdf_raw[:, :]
+                    if 'bad_value_scaled' in self.hdf_raw.attributes():
+                        # hdf_value[hdf_value == hdf_raw.attributes()['bad_value_scaled']] = np.nan
+                        self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['bad_value_scaled'], np.nan, self.hdf_value)
+                        print("'bad_value_scaled' data is changed to np.nan...\n")
 
-    for fullname in fullnames[:] :
-        #fullname = fullnames[8]
-        if fullname[-4:].lower() == ".hdf" :
-            print('#' * 40,
-                  "\n{2:.01f}%  ({0}/{1}) {3}".format(nn, len(fullnames), (nn / len(fullnames)) * 100,
-                                                      os.path.basename(__file__)))
-            print("Starting...   fullname: {}".format(fullname))
+                    elif 'fill_value' in self.hdf_raw.attributes():
+                        # hdf_value[hdf_value == hdf_raw.attributes()['fill_value']] = np.nan
+                        self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['fill_value'], np.nan, self.hdf_value)
+                        print("'fill_value' data is changed to np.nan...\n")
 
-            fullname_el = fullname.split("/")
-            filename_el = fullname_el[-1].split(".")
-            save_dr = fullname[:-len(fullname_el[-1])]
-            print("Reading hdf file {0}\n".format(fullname))
+                    elif '_FillValue' in self.hdf_raw.attributes():
+                        # hdf_value[hdf_value == hdf_raw.attributes()['_FillValue']] = np.nan
+                        self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['_FillValue'], np.nan, self.hdf_value)
+                        print("'_FillValue' data is changed to np.nan...\n")
 
-            try :
-                hdf_raw, latitude, longitude, cntl_pt_cols, cntl_pt_rows \
-                    = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME)
-                hdf_value = hdf_raw[:, :]
-                if 'bad_value_scaled' in hdf_raw.attributes() :
-                    #hdf_value[hdf_value == hdf_raw.attributes()['bad_value_scaled']] = np.nan
-                    hdf_value = np.where(hdf_value == hdf_raw.attributes()['bad_value_scaled'], np.nan, hdf_value)
-                    print("'bad_value_scaled' data is changed to np.nan...\n")
+                    else:
+                        # hdf_value = np.where(hdf_value == hdf_value.min(), np.nan, hdf_value)
+                        print("Minium value of hdf data is not changed to np.nan ...\n")
 
-                elif 'fill_value' in hdf_raw.attributes() :
-                    #hdf_value[hdf_value == hdf_raw.attributes()['fill_value']] = np.nan
-                    hdf_value = np.where(hdf_value == hdf_raw.attributes()['fill_value'], np.nan, hdf_value)
-                    print("'fill_value' data is changed to np.nan...\n")
+                        self.hdf_value = np.where(self.hdf_value == -32767, np.nan, self.hdf_value)
+                        print("-32767 value of hdf data is changed to np.nan ...\n")
 
-                elif '_FillValue' in hdf_raw.attributes() :
-                    #hdf_value[hdf_value == hdf_raw.attributes()['_FillValue']] = np.nan
-                    hdf_value = np.where(hdf_value == hdf_raw.attributes()['_FillValue'], np.nan, hdf_value)
-                    print("'_FillValue' data is changed to np.nan...\n")
+                    if 'valid_range' in self.hdf_raw.attributes():
+                        # hdf_value[hdf_value < hdf_raw.attributes()['valid_range'][0]] = np.nan
+                        # hdf_value[hdf_value > hdf_raw.attributes()['valid_range'][1]] = np.nan
 
-                else :
-                    #hdf_value = np.where(hdf_value == hdf_value.min(), np.nan, hdf_value)
-                    print("Minium value of hdf data is not changed to np.nan ...\n")
+                        self.hdf_value = np.where(self.hdf_value < self.hdf_raw.attributes()['valid_range'][0], np.nan, self.hdf_value)
+                        self.hdf_value = np.where(self.hdf_value > self.hdf_raw.attributes()['valid_range'][1], np.nan, self.hdf_value)
+                        print("invalid_range data changed to np.nan...\n")
 
-                    hdf_value = np.where(hdf_value == -32767, np.nan, hdf_value)
-                    print("-32767 value of hdf data is changed to np.nan ...\n")
+                    if 'scale_factor' in self.hdf_raw.attributes() and 'add_offset' in self.hdf_raw.attributes():
+                        self.scale_factor = self.hdf_raw.attributes()['scale_factor']
+                        self.offset = self.hdf_raw.attributes()['add_offset']
 
-                if 'valid_range' in hdf_raw.attributes() :
-                    #hdf_value[hdf_value < hdf_raw.attributes()['valid_range'][0]] = np.nan
-                    #hdf_value[hdf_value > hdf_raw.attributes()['valid_range'][1]] = np.nan
+                    elif 'slope' in self.hdf_raw.attributes() and 'intercept' in self.hdf_raw.attributes():
+                        self.scale_factor = self.hdf_raw.attributes()['slope']
+                        self.offset = self.hdf_raw.attributes()['intercept']
 
-                    hdf_value = np.where(hdf_value < hdf_raw.attributes()['valid_range'][0], np.nan, hdf_value)
-                    hdf_value = np.where(hdf_value > hdf_raw.attributes()['valid_range'][1], np.nan, hdf_value)
-                    print("invalid_range data changed to np.nan...\n")
+                    else:
+                        self.scale_factor, self.offset = 1, 0
 
-                if 'scale_factor' in hdf_raw.attributes() and 'add_offset' in hdf_raw.attributes() :
-                    scale_factor = hdf_raw.attributes()['scale_factor']
-                    offset = hdf_raw.attributes()['add_offset']
+                    self.hdf_value = np.asarray(self.hdf_value)
+                    self.hdf_value = self.hdf_value * self.scale_factor + self.offset
 
-                elif 'slope' in hdf_raw.attributes() and 'intercept' in hdf_raw.attributes() :
-                    scale_factor = hdf_raw.attributes()['slope']
-                    offset = hdf_raw.attributes()['intercept']
+                    print("latitude: {}".format(self.latitude))
+                    print("longitude: {}".format(self.longitude))
+                    print("hdf_value: {}".format(self.hdf_value))
+                    print("str(hdf_raw.attributes()): {}".format(str(self.hdf_raw.attributes())))
 
-                else :
-                    scale_factor, offset = 1, 0
+                    self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
+                    #filename, Wlon, Elon, Slat, Nlat, mean(hdf_value), min(hdf_value), max(hdf_value), hdf_raw.attributes()
+                    self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}\n".format(self.fullname_el[-1],
+                            self.Wlon, self.Elon, self.Slat, self.Nlat,
+                            np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
+                            self.hdf_raw.attributes())
+                    print("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]))
+                    with open("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]), 'a') as f_info:
+                        f_info.write(self.hdf_info)
+                        print("added {}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3]) - 1)]))
 
-                hdf_value = np.asarray(hdf_value)
-                hdf_value = hdf_value * scale_factor + offset
+                    print("plotting histogram {}".format(self.fullname))
+                    self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
+                                                                      DATAFIELD_NAME, Dataset_DOI)
+                    self.plt_hist.savefig("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
+                    self.plt_hist.close()
+                    ######################################################################################
+                    Python_utilities.write_log(log_file,
+                            "{}{}_hist.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
-                print("latitude: {}".format(latitude))
-                print("longitude: {}".format(longitude))
-                print("hdf_value: {}".format(hdf_value))
-                print("str(hdf_raw.attributes()): {}".format(str(hdf_raw.attributes())))
+                    # Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
+                    print("plotting on the map {}".format(self.fullname))
+                    self.plt_map = MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(self.hdf_value, self.longitude, self.latitude, self.fullname,
+                                                                             DATAFIELD_NAME, Dataset_DOI)
+                    self.plt_map.savefig("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
+                    self.plt_map.close()
+                    ######################################################################################
+                    Python_utilities.write_log(log_file,
+                            "{}{}_map.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
-                #Wlon, Elon, Slat, Nlat, Clon, Clat = MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
-                print("plotting histogram {}".format(fullname))
-                plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
-                plt_hist.savefig("{}{}_hist.png".format(save_dr, fullname_el[-1][:-4]), overwrite=True)
-                plt_hist.close()
-                ######################################################################################
-                Python_utilities.write_log(log_file, "{}{}_hist.png is created...".format(save_dr, fullname_el[-1][:-4]))
+                except Exception as err:
+                    Python_utilities.write_log(err_log_file,
+                            "{}, error: {}".format(self.fullname_el[-1], err))
 
-                print("plotting on the map {}".format(fullname))
-                #Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
-                plt_map = MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
-                plt_map.savefig("{}{}_map.png".format(save_dr, fullname_el[-1][:-4]), overwrite=True)
-                plt_map.close()
-                ######################################################################################
+fullnames = []
+for dirName in base_drs :
+    #dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
+    try :
+        fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
+    except Exception as err :
+        #Python_utilities.write_log(err_log_file, err)
+        print(err)
+        continue
+#fullnames = sorted(fullnames)
+#########################################
 
-                Python_utilities.write_log(log_file,
-                              "{}{}_map.png is created...".format(save_dr, fullname_el[-1][:-4]))
+myMP = Multiprocessor()
+num_cpu = 3
+values = []
+num_batches = len(fullnames) // num_cpu + 1
 
-            except Exception as err :
-                #MODIS_AOD_utilities.write_log(err_log_file, err)
-                print(err)
-                continue
+for batch in range(num_batches):
+    myMP.restart()
+    for fullname in fullnames[batch*num_batches:(batch+1)*num_batches]:
+        myMP.run(Plotter, fullname)
+
+    print("Batch " + str(batch))
+    myMP.wait()
+    values.append(myMP.wait())
+    print("OK batch" + str(batch))
+
