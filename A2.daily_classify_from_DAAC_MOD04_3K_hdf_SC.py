@@ -3,18 +3,37 @@
 '''
 #############################################################
 
+
+CREATE TABLE IF NOT EXISTS `MODIS_Aerosol`.`hdf_info` (
+    `id` INT NOT NULL AUTO_INCREMENT ,
+    `fullname` VARCHAR(16384) default NULL ,
+    `Wlon` VARCHAR(16) default NULL ,
+    `Elon` VARCHAR(16) default NULL ,
+    `Slat` VARCHAR(16) default NULL ,
+	`Nlat` VARCHAR(16) default NULL ,
+	`Clon` VARCHAR(16) default NULL ,
+	`Clat` VARCHAR(16) default NULL ,
+	`Mean_val` VARCHAR(16) default NULL ,
+	`Min_val` VARCHAR(16) default NULL ,
+	`Max_val` VARCHAR(16) default NULL ,
+	`Attribute` TEXT default NULL ,
+	`histogram_png` INT default NULL ,
+	`histogram_png_DT` DATETIME default NULL ,
+	`map_png` INT default NULL ,
+    `map_png_DT` DATETIME default NULL ,
+    PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
 '''
 
 import numpy as np
 import pandas as pd
 import os
+from datetime import datetime
 import MODIS_AOD_utilities
 import Python_utilities
-from datetime import datetime
-
 
 #########################################
-# Set variables
+# Set log file
 #########################################
 log_dir = "logs/"
 log_file = "{}{}.log".format(log_dir, os.path.basename(__file__)[:-3])
@@ -44,8 +63,7 @@ Llon, Rlon, Slat, Nlat = 110, 150, 10, 60
 save_dr = "../L3_{0}/{0}_{1}_{2}_{3}_{4}_{5}_{6}/".format(DATAFIELD_NAME, str(Llon), str(Rlon),
                                                         str(Slat), str(Nlat), str(resolution), "date_3K")
 
-
-#########################################  
+#########################################
 
 if not os.path.exists(save_dr):
     os.makedirs(save_dr)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Auther guitar79@naver.com
+# Author guitar79@naver.com
 
 """
 CREATE TABLE "hdf_info" (
@@ -25,7 +25,6 @@ from pathlib import Path
 
 import Python_utilities
 
-np.set_printoptions(threshold=100)
 
 import sqlite3
 from sqlite3 import Error
@@ -49,9 +48,9 @@ base_drs = ['../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/',
             '../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/']
 
 base_dr = '../Aerosol/'
-base_dr = ''
+#base_dr = ''
 
-DB_fn = 'Aerosel.db'
+DB_fn = 'Aerosel_file_info.sqlite'
 
 table_hdf_info = 'hdf_info'
 # def create_connection(drbase+drin+infile):
@@ -76,7 +75,6 @@ q1 = """CREATE TABLE IF NOT EXISTS '{}' (
 	PRIMARY KEY('id' AUTOINCREMENT));""".format(table_hdf_info)
 
 cur.execute(q1)
-
 conn.commit()
 conn.close()
 

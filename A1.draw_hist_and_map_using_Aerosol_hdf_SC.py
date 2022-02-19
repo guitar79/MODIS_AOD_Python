@@ -2,11 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 #############################################################
-#runfile('./classify_AVHRR_asc_SST-01.py', 'daily 0.1 2019', wdir='./MODIS_hdf_Python/')
-#cd '/mnt/14TB1/RS-data/KOSC/MODIS_hdf_Python' && for yr in {2011..2020}; do python classify_AVHRR_asc_SST-01.py daily 0.05 $yr; done
-#conda activate MODIS_hdf_Python_env && cd '/mnt/14TB1/RS-data/KOSC/MODIS_hdf_Python' && python classify_AVHRR_asc_SST.py daily 0.01 2011
-#conda activate MODIS_hdf_Python_env && cd /mnt/Rdata/RS-data/KOSC/MODIS_hdf_Python/ && A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 1.0 2019
-#conda activate MODIS_hdf_Python_env && cd /mnt/6TB1/RS_data/MODIS_AOD/MODIS_hdf_Python/ && python A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2000
+
 '''
 
 from glob import glob
@@ -27,6 +23,48 @@ log_file = "{}{}.log".format(log_dir, os.path.basename(__file__)[:-3])
 err_log_file = "{}{}_err.log".format(log_dir, os.path.basename(__file__)[:-3])
 print ("log_file: {}".format(log_file))
 print ("err_log_file: {}".format(err_log_file))
+#########################################
+
+#########################################
+# mariaDB info
+#########################################
+SET_MariaDB = True
+if SET_MariaDB == True :
+    import pymysql
+    db_host = '192.168.0.20'
+    db_user = 'root'
+    db_pass = 'Pkh19255102@'
+    db_name = 'MODIS_Aerosol'
+    table_hdf_info = 'hdf_info'
+
+    conn = pymysql.connect(host=db_host, port=3306,
+                           user=db_user, password=db_pass, db=db_name,
+                           charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
+
+    cur = conn.cursor()
+
+    q1 = """CREATE TABLE IF NOT EXIST `{}`.`{}` (
+        `id` INT NOT NULL ,
+        `fullname` VARCHAR(16384) default NULL ,
+        `Wlon` VARCHAR(16) default NULL ,
+        `Elon` VARCHAR(16) default NULL ,
+        `Slat` VARCHAR(16) default NULL ,
+    	`Nlat` VARCHAR(16) default NULL ,
+    	`Clon` VARCHAR(16) default NULL ,
+    	`Clat` VARCHAR(16) default NULL ,
+    	`Mean_val` VARCHAR(16) default NULL ,
+    	`Min_val` VARCHAR(16) default NULL ,
+    	`Max_val` VARCHAR(16) default NULL ,
+    	`Attribute` TEXT default NULL ,
+    	`histogram_png` INT default NULL ,
+    	`histogram_png_DT` DATETIME default NULL ,
+    	`map_png` INT default NULL ,
+        `map_png_DT` DATETIME default NULL ,
+        PRIMARY KEY (`id` AUTO_INCREMENT)) ENGINE = InnoDB;""".format(db_name, table_hdf_info)
+
+    cur.execute(q1)
+    conn.commit()
+#########################################
 
 #########################################
 # Set variables
@@ -142,6 +180,23 @@ class Plotter():
                                                                             self.hdf_raw.attributes())
                                 with open("{}.csv".format(base_dr[:-1]), 'a') as f_info:
                                     f_info.write(self.hdf_info)
+
+                                if SET_MariaDB == True:
+                                    #cur = conn.cursor()
+                                    q2 = """SELECT `id` FROM `{}`.`{}` WHERE `fullname`= '{}';""".format(db_name, table_hdf_info, self.fullname)
+                                    q2_sel = cur.execute(q2)
+                                    if q2_sel == 0 :
+                                        q2_hdf = """INSERT INTO `{0}`.`{1}`                                         
+                                                    (`fullname`, `Elon`) VALUES ('{2}', '{3}');""".format(db_name, table_hdf_info,
+                                                                                            "daf", "dfa")
+
+                                    else :
+                                        q2_hdf = """UPDATE `{0}`.`{1}` 
+                                                    SET `fullname` = 'agfd//' , 
+                                                    `Elon` = '32'  
+                                                    WHERE `{1}`.`id` = {2};""".format(db_name, table_hdf_info, q2_sel)
+                                    cur.execute(q2_hdf)
+                                    conn.commit()
 
                                 print("plotting histogram {}".format(self.fullname))
                                 self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,

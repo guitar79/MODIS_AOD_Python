@@ -25,8 +25,8 @@ dependencies:
   - brotlipy=0.7.0=py38h497a2fe_1001
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f8727e_0
-  - ca-certificates=2021.10.8=ha878542_0
-  - certifi=2021.10.8=py38h578d9bd_1
+  - ca-certificates=2021.10.26=h06a4308_2
+  - certifi=2021.10.8=py38h06a4308_2
   - cffi=1.15.0=py38hd667e15_1
   - cftime=1.5.0=py38hb5d20a5_0
   - chardet=4.0.0=py38h578d9bd_2
@@ -154,6 +154,7 @@ dependencies:
   - pyhdf=0.10.3=py38he643327_0
   - pylint=2.7.2=py38h578d9bd_0
   - pyls-spyder=0.4.0=pyhd8ed1ab_0
+  - pymysql=1.0.2=py38h06a4308_1
   - pyopenssl=22.0.0=pyhd8ed1ab_0
   - pyparsing=3.0.7=pyhd8ed1ab_0
   - pyproj=2.6.1.post1=py38h56787f0_3
