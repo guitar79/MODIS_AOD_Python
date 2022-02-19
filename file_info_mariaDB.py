@@ -89,7 +89,7 @@ conn = pymysql.connect(host=db_host, port=3306,
 cur = conn.cursor()
 
 q1 = """CREATE TABLE IF NOT EXIST `{}`.`{}` (
-    `id` INT NOT NULL ,
+    `id` INT NOT NULL AUTO_INCREMENT ,
     `fullname` VARCHAR(16384) default NULL ,
     `Wlon` VARCHAR(16) default NULL ,
     `Elon` VARCHAR(16) default NULL ,
@@ -105,7 +105,7 @@ q1 = """CREATE TABLE IF NOT EXIST `{}`.`{}` (
 	`histogram_png_DT` DATETIME default NULL ,
 	`map_png` INT default NULL ,
     `map_png_DT` DATETIME default NULL ,
-    PRIMARY KEY (`id` AUTO_INCREMENT)) ENGINE = InnoDB;""".format(db_name, table_hdf_info)
+    PRIMARY KEY (`id`)) ENGINE = InnoDB;""".format(db_name, table_hdf_info)
 
 cur.execute(q1)
 conn.commit()
