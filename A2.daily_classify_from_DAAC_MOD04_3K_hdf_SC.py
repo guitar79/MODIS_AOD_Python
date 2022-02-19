@@ -12,10 +12,9 @@ import MODIS_AOD_utilities
 import Python_utilities
 from datetime import datetime
 
-#threading library
-import threading
-import sys
 
+#########################################
+# Set variables
 #########################################
 log_dir = "logs/"
 log_file = "{}{}.log".format(log_dir, os.path.basename(__file__)[:-3])
@@ -44,6 +43,7 @@ Llon, Rlon, Slat, Nlat = 110, 150, 10, 60
 
 save_dr = "../L3_{0}/{0}_{1}_{2}_{3}_{4}_{5}_{6}/".format(DATAFIELD_NAME, str(Llon), str(Rlon),
                                                         str(Slat), str(Nlat), str(resolution), "date_3K")
+
 
 #########################################  
 
@@ -335,21 +335,7 @@ class Classifier():
                                                    self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
                                                    str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
 
-class Classify_unit(threading.Thread):
-    # def __init__(self, working_Date, threadno):
-    def __init__(self, proc_dates, df, threadno):
-        threading.Thread.__init__(self)
-        self.proc_dates = proc_dates
-        df = df
-        # self.working_Date = working_Date
-        self.threadno = threadno
-        sys.stderr.write('Thread #{} started...\n'.format(self.threadno))
-
-    def run(self):
-        for self.proc_date in self.proc_dates:
-            fetcher = Classifier(self.proc_date, self.threadno)
-            fetcher.fetch()
-            sys.stderr.write('Thread #{} - fetched {}...\n'.format(self.threadno, self.proc_date))
+#########################################
 
 fullnames = []
 for dirName in base_drs[:] :
@@ -397,5 +383,4 @@ if __name__ == '__main__' :
 	threadno = 0
 	#num_thread = 10000
 	for proc_date in proc_dates:
-		fetcher = Classifier(proc_date, threadno)
-		fetcher.fetch()
+		Classifier(proc_date, threadno)

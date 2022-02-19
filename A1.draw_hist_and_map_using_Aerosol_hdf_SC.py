@@ -10,12 +10,6 @@ import numpy as np
 import os
 import MODIS_AOD_utilities
 import Python_utilities
-from datetime import datetime
-
-#threading library
-from queue import Queue
-import threading
-import sys
 
 #########################################
 log_dir = "logs/"
@@ -51,7 +45,6 @@ class Plotter():
     def __init__(self, fullname):
         self.fullname = fullname
 
-    #@def fetch(self):
         if self.fullname[-4:].lower() == ".hdf":
 
             print("Starting...   self.fullname: {}".format(self.fullname))
@@ -125,6 +118,7 @@ class Plotter():
                             np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
                             self.hdf_raw.attributes())
                     print("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]))
+
                     with open("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]), 'a') as f_info:
                         f_info.write(self.hdf_info)
                         print("added {}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3]) - 1)]))
@@ -166,5 +160,5 @@ fullnames = sorted(fullnames)
 
 if __name__ == '__main__' :
     for fullname in fullnames:
-        fetcher = Plotter(fullname)
+        Plotter(fullname)
         print("Finishing...   fullname: {}".format(fullname))

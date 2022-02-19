@@ -139,6 +139,7 @@ def draw_histogram_hdf(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME,
     import numpy as np
     Wlon, Elon, Slat, Nlat, Clon, Clat = findRangeOfMap(longitude, latitude)
     plt.figure(figsize=(10, 10))
+    plt.rcParams.update({'figure.max_open_warning': 0})
     plt.title("Histogram of {0}".format(DATAFIELD_NAME), fontsize=20, pad=30)
     plt.annotate(
         "value mean: {0:.03f}, min: {1:.03f} max: {2:.03f}, \nlongigude : {3:.03f}~{4:.03f}\nlatitude: {5:.03f}~{6:.03f}". \
@@ -161,6 +162,7 @@ def draw_histogram(hdf_value, longitude, latitude, save_dir_name, fullname, DATA
     import matplotlib.pyplot as plt
     import numpy as np
     plt.figure(figsize=(12, 8))
+    plt.rcParams.update({'figure.max_open_warning': 0})
     plt.title("Histogram of {0} \n".format(DATAFIELD_NAME), fontsize=16)
     plt.annotate('created by guitar79@gs.hs.kr\nAir quality procuct using AirKorea data',
                  xy=(1, 0), xytext=(12, -28), va='top', ha='right',
@@ -185,6 +187,7 @@ def draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIE
     from mpl_toolkits.basemap import Basemap
     import matplotlib.pyplot as plt
     plt.figure(figsize=(10, 10))
+    plt.rcParams.update({'figure.max_open_warning': 0})
     Wlon, Elon, Slat, Nlat, Clon, Clat = findRangeOfMap(longitude, latitude)
     # map
     m = Basemap(projection='laea', lat_ts=Clat, lat_0=Clat, lon_0=Clon, \
