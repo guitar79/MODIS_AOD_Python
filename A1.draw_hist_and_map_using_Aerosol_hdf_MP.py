@@ -2,11 +2,7 @@
 # -*- coding: utf-8 -*-
 '''
 #############################################################
-#runfile('./classify_AVHRR_asc_SST-01.py', 'daily 0.1 2019', wdir='./MODIS_hdf_Python/')
-#cd '/mnt/14TB1/RS-data/KOSC/MODIS_hdf_Python' && for yr in {2011..2020}; do python classify_AVHRR_asc_SST-01.py daily 0.05 $yr; done
-#conda activate MODIS_hdf_Python_env && cd '/mnt/14TB1/RS-data/KOSC/MODIS_hdf_Python' && python classify_AVHRR_asc_SST.py daily 0.01 2011
-#conda activate MODIS_hdf_Python_env && cd /mnt/Rdata/RS-data/KOSC/MODIS_hdf_Python/ && A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 1.0 2019
-#conda activate MODIS_hdf_Python_env && cd /mnt/6TB1/RS_data/MODIS_AOD/MODIS_hdf_Python/ && python A2.daily_classify_from_DAAC_MOD04_3K_hdf.py 0.01 2000
+
 '''
 
 from glob import glob
@@ -66,6 +62,8 @@ base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 10km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
+
+#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2017/001/"]
 Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
 
 # Set Datafield name
@@ -73,29 +71,29 @@ DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
 #########################################
 
 #########################################
-#single thread class
+#single  class
 #########################################
 class Plotter():
     def __init__(self, fullname):
         self.fullname = fullname
 
-    #def fetch(self):
-
+    #@def fetch(self):
         if self.fullname[-4:].lower() == ".hdf":
+
             print("Starting...   self.fullname: {}".format(self.fullname))
             self.fullname_el = self.fullname.split("/")
             self.filename_el = self.fullname_el[-1].split(".")
             self.save_dr = self.fullname[:-len(self.fullname_el[-1])]
 
-            if (os.path.exists("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]))\
-                and os.path.exists("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4]))):
+            #if False and (os.path.exists("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4])) \
+            if (os.path.exists("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4])) \
+                    and os.path.exists("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4]))):
                 print("{0}{1}_map.png and {0}{1}_hist.png are already exist...".format(self.save_dr, self.fullname_el[-1][:-4]))
             else:
                 print("Reading hdf file {0}\n".format(self.fullname))
-
                 try:
                     self.hdf_raw, self.latitude, self.longitude, self.cntl_pt_cols, self.cntl_pt_rows \
-                        = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
+                            = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
                     self.hdf_value = self.hdf_raw[:, :]
                     if 'bad_value_scaled' in self.hdf_raw.attributes():
                         # hdf_value[hdf_value == hdf_raw.attributes()['bad_value_scaled']] = np.nan
@@ -146,7 +144,17 @@ class Plotter():
                     print("hdf_value: {}".format(self.hdf_value))
                     print("str(hdf_raw.attributes()): {}".format(str(self.hdf_raw.attributes())))
 
-                    #self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
+                    self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
+                    #filename, Wlon, Elon, Slat, Nlat, mean(hdf_value), min(hdf_value), max(hdf_value), hdf_raw.attributes()
+                    self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}\n".format(self.fullname_el[-1],
+                            self.Wlon, self.Elon, self.Slat, self.Nlat,
+                            np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
+                            self.hdf_raw.attributes())
+                    print("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]))
+                    with open("{}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3])-1)]), 'a') as f_info:
+                        f_info.write(self.hdf_info)
+                        print("added {}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3]) - 1)]))
+
                     print("plotting histogram {}".format(self.fullname))
                     self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
                                                                       DATAFIELD_NAME, Dataset_DOI)
@@ -154,7 +162,7 @@ class Plotter():
                     self.plt_hist.close()
                     ######################################################################################
                     Python_utilities.write_log(log_file,
-                                                  "{}{}_hist.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
+                            "{}{}_hist.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
                     # Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
                     print("plotting on the map {}".format(self.fullname))
@@ -163,12 +171,12 @@ class Plotter():
                     self.plt_map.savefig("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
                     self.plt_map.close()
                     ######################################################################################
-
                     Python_utilities.write_log(log_file,
-                                                  "{}{}_map.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
+                            "{}{}_map.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
                 except Exception as err:
-                    pass
+                    Python_utilities.write_log(err_log_file,
+                            "{}, error: {}".format(self.fullname_el[-1], err))
 
 fullnames = []
 for dirName in base_drs :
@@ -179,11 +187,11 @@ for dirName in base_drs :
         #Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
-fullnames = sorted(fullnames)
-print(fullnames)
+#fullnames = sorted(fullnames)
+#########################################
 
 myMP = Multiprocessor()
-num_cpu = 2
+num_cpu = 3
 values = []
 num_batches = len(fullnames) // num_cpu + 1
 
@@ -196,4 +204,3 @@ for batch in range(num_batches):
     myMP.wait()
     values.append(myMP.wait())
     print("OK batch" + str(batch))
-

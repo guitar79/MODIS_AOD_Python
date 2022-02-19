@@ -60,27 +60,27 @@ else :
 #single thread class
 #########################################
 class Classifier():
-    def __init__(self, proc_date):
+    def __init__(self, proc_date, threadno):
         self.proc_date = proc_date
-
+        self.threadno = threadno
+    def fetch(self):
         print("Starting process data in {0} - {1} ...\n" \
               .format(self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d')))
         self.df_proc = df[(df['fullname_dt'] >= self.proc_date[0]) & (df['fullname_dt'] < self.proc_date[1])]
 
         # check file exist??
-        #if False and (os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
-        if (os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
-                .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
-                    self.proc_date[1].strftime('%Y%m%d'),
-                    str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))) \
-            and os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.csv' \
-                .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
-                    self.proc_date[1].strftime('%Y%m%d'),
-                    str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))):
+        if False and (os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
+                                             .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
+                                                     self.proc_date[1].strftime('%Y%m%d'),
+                                                     str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))) \
+                      and os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.csv' \
+                                                 .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
+                                                         self.proc_date[1].strftime('%Y%m%d'),
+                                                         str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))):
 
             print(('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are exist...'
-               .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
-                   str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))))
+                   .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
+                           str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))))
 
         else:
             if len(self.df_proc) == 0:
@@ -335,6 +335,22 @@ class Classifier():
                                                    self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
                                                    str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
 
+class Classify_unit(threading.Thread):
+    # def __init__(self, working_Date, threadno):
+    def __init__(self, proc_dates, df, threadno):
+        threading.Thread.__init__(self)
+        self.proc_dates = proc_dates
+        df = df
+        # self.working_Date = working_Date
+        self.threadno = threadno
+        sys.stderr.write('Thread #{} started...\n'.format(self.threadno))
+
+    def run(self):
+        for self.proc_date in self.proc_dates:
+            fetcher = Classifier(self.proc_date, self.threadno)
+            fetcher.fetch()
+            sys.stderr.write('Thread #{} - fetched {}...\n'.format(self.threadno, self.proc_date))
+
 fullnames = []
 for dirName in base_drs[:] :
     #dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
@@ -344,7 +360,6 @@ for dirName in base_drs[:] :
         #Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
-
 fullnames = sorted(fullnames)
 df = pd.DataFrame({'fullname':fullnames})
 
@@ -382,5 +397,5 @@ if __name__ == '__main__' :
 	threadno = 0
 	#num_thread = 10000
 	for proc_date in proc_dates:
-		fetcher = Classifier(proc_date)
+		fetcher = Classifier(proc_date, threadno)
 		fetcher.fetch()

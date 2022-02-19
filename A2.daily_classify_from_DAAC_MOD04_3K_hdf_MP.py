@@ -15,6 +15,7 @@ from datetime import datetime
 #########################################
 from multiprocessing import Process, Queue
 
+
 class Multiprocessor():
     def __init__(self):
         self.processes = []
@@ -49,68 +50,69 @@ class Multiprocessor():
 log_dir = "logs/"
 log_file = "{}{}.log".format(log_dir, os.path.basename(__file__)[:-3])
 err_log_file = "{}{}_err.log".format(log_dir, os.path.basename(__file__)[:-3])
-print ("log_file: {}".format(log_file))
-print ("err_log_file: {}".format(err_log_file))
+print("log_file: {}".format(log_file))
+print("err_log_file: {}".format(err_log_file))
 
 #########################################
 # Set variables
 #########################################
-#base_dr = "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"
-#Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MOD04_L2.006"
-#base_dr = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/"
-#Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
+# base_dr = "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"
+# Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MOD04_L2.006"
+# base_dr = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/"
+# Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MYD04_L2.006"
 
 base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
-              "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"]
+            "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/"]
 base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 10km/",
-              "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
-#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
+            "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
+# base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2016/"]
 
 # Set Datafield name
 DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
 resolution = 0.01
 
-#Set lon, lat, resolution
+# Set lon, lat, resolution
 Llon, Rlon, Slat, Nlat = 110, 150, 10, 60
 
 save_dr = "../L3_{0}/{0}_{1}_{2}_{3}_{4}_{5}_{6}/".format(DATAFIELD_NAME, str(Llon), str(Rlon),
-                                                        str(Slat), str(Nlat), str(resolution), "date_10K")
+                                                          str(Slat), str(Nlat), str(resolution), "date_10K")
 
 #########################################  
 
 if not os.path.exists(save_dr):
     os.makedirs(save_dr)
-    print ('*'*80)
-    print ("{} is created...".format(save_dr))
-else :
-    print ('*'*80)
-    print ("{} is already exist...".format(save_dr))
+    print('*' * 80)
+    print("{} is created...".format(save_dr))
+else:
+    print('*' * 80)
+    print("{} is already exist...".format(save_dr))
 
 
 #########################################
-#single thread class
+# single thread class
 #########################################
 class Classifier():
     def __init__(self, proc_date):
         self.proc_date = proc_date
-        
-    #def fetch(self):
+
+        # def fetch(self):
         print("Starting process data in {0} - {1} ...\n" \
               .format(self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d')))
         self.df_proc = df[(df['fullname_dt'] >= self.proc_date[0]) & (df['fullname_dt'] < self.proc_date[1])]
 
         # check file exist??
         if (os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
-                                             .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
-                                                     self.proc_date[1].strftime('%Y%m%d'),
-                                                     str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))) \
-                      and os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.csv' \
-                                                 .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
-                                                         self.proc_date[1].strftime('%Y%m%d'),
-                                                         str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))):
+                                   .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
+                                           self.proc_date[1].strftime('%Y%m%d'),
+                                           str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))) \
+                and os.path.exists('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.csv' \
+                                           .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
+                                                   self.proc_date[1].strftime('%Y%m%d'),
+                                                   str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))):
 
             print(('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are exist...'
-                   .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
+                   .format(save_dr, DATAFIELD_NAME, self.proc_date[0].strftime('%Y%m%d'),
+                           self.proc_date[1].strftime('%Y%m%d'),
                            str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution))))
 
         else:
@@ -144,7 +146,8 @@ class Classifier():
                     # self.fullname = self.df_proc["fullname"][0]
                     self.file_no += 1
                     self.fullname_el = self.fullname.split("/")
-                    print("Reading hdf file {0}/{1} : {2}\n".format(self.file_no, len(self.df_proc["fullname"]), self.fullname))
+                    print("Reading hdf file {0}/{1} : {2}\n".format(self.file_no, len(self.df_proc["fullname"]),
+                                                                    self.fullname))
 
                     try:
                         self.hdf_raw, self.latitude, self.longitude, self.cntl_pt_cols, self.cntl_pt_rows \
@@ -154,18 +157,21 @@ class Classifier():
 
                         if 'bad_value_scaled' in self.hdf_raw.attributes():
                             # self.hdf_value[self.hdf_value == self.hdf_raw.attributes()['bad_value_scaled']] = np.nan
-                            self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['bad_value_scaled'], np.nan,
-                                                 self.hdf_value)
+                            self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['bad_value_scaled'],
+                                                      np.nan,
+                                                      self.hdf_value)
                             # print("'bad_value_scaled' data is changed to np.nan...\n")
 
                         elif 'fill_value' in self.hdf_raw.attributes():
                             # self.hdf_value[self.hdf_value == self.hdf_raw.attributes()['fill_value']] = np.nan
-                            self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['fill_value'], np.nan, self.hdf_value)
+                            self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['fill_value'], np.nan,
+                                                      self.hdf_value)
                             # print("'fill_value' data is changed to np.nan...\n")
 
                         elif '_FillValue' in self.hdf_raw.attributes():
                             # self.hdf_value[self.hdf_value == self.hdf_raw.attributes()['_FillValue']] = np.nan
-                            self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['_FillValue'], np.nan, self.hdf_value)
+                            self.hdf_value = np.where(self.hdf_value == self.hdf_raw.attributes()['_FillValue'], np.nan,
+                                                      self.hdf_value)
                             # print("'_FillValue' data is changed to np.nan...\n")\
 
                         else:
@@ -173,8 +179,10 @@ class Classifier():
                             # print("-32767 value of hdf data is changed to np.nan ...\n")
 
                         if 'valid_range' in self.hdf_raw.attributes():
-                            self.hdf_value = np.where(self.hdf_value < self.hdf_raw.attributes()['valid_range'][0], np.nan, self.hdf_value)
-                            self.hdf_value = np.where(self.hdf_value > self.hdf_raw.attributes()['valid_range'][1], np.nan, self.hdf_value)
+                            self.hdf_value = np.where(self.hdf_value < self.hdf_raw.attributes()['valid_range'][0],
+                                                      np.nan, self.hdf_value)
+                            self.hdf_value = np.where(self.hdf_value > self.hdf_raw.attributes()['valid_range'][1],
+                                                      np.nan, self.hdf_value)
                             # print("invalid_range data changed to np.nan...\n")
 
                         if 'scale_factor' in self.hdf_raw.attributes() and 'add_offset' in self.hdf_raw.attributes():
@@ -209,8 +217,9 @@ class Classifier():
                                 self.longitude_new = np.empty(shape=(np.shape(self.hdf_value)))
                                 for row in range(len(self.longitude[0])):
                                     for i in range(len(self.cntl_pt_rows) - 1):
-                                        self.longitude_value = np.linspace(self.longitude[row, i], self.longitude[row, i + 1],
-                                                                      self.cntl_pt_rows[i])
+                                        self.longitude_value = np.linspace(self.longitude[row, i],
+                                                                           self.longitude[row, i + 1],
+                                                                           self.cntl_pt_rows[i])
                                         for j in range(i):
                                             self.longitude_new[row, row + j] = self.longitude_value[j]
                                             # print("np.shape(self.longitude_new): {}".format(np.shape(self.longitude_new)))
@@ -223,11 +232,13 @@ class Classifier():
                                 for row in range(len(self.longitude[1])):
                                     for i in range(len(self.cntl_pt_cols) - 1):
                                         self.longitude_value = np.linspace(self.longitude[row, i], \
-                                                                      self.longitude[row, i + 1], \
-                                                                      self.cntl_pt_cols[i + 1] - self.cntl_pt_cols[i] + 1)
+                                                                           self.longitude[row, i + 1], \
+                                                                           self.cntl_pt_cols[i + 1] - self.cntl_pt_cols[
+                                                                               i] + 1)
 
                                         for j in range(len(self.longitude_value) - 1):
-                                            self.longitude_new[row, self.cntl_pt_cols[i] - 1 + j] = self.longitude_value[j]
+                                            self.longitude_new[row, self.cntl_pt_cols[i] - 1 + j] = \
+                                            self.longitude_value[j]
                                         self.longitude_new[row, np.shape(self.longitude_new)[1] - 1] = self.longitude[
                                             row, np.shape(self.longitude)[1] - 1]
                                 # print("np.shape(self.longitude_new): {}".format(np.shape(self.longitude_new)))
@@ -242,8 +253,9 @@ class Classifier():
                                 self.latitude_new = np.empty(shape=(np.shape(self.hdf_value)))
                                 for row in range(len(self.latitude[0])):
                                     for i in range(len(self.cntl_pt_rows) - 1):
-                                        self.latitude_value = np.linspace(self.latitude[row, i], self.latitude[row, i + 1],
-                                                                     self.cntl_pt_rows[i])
+                                        self.latitude_value = np.linspace(self.latitude[row, i],
+                                                                          self.latitude[row, i + 1],
+                                                                          self.cntl_pt_rows[i])
                                         for j in range(i):
                                             self.latitude_new[row, row + j] = self.latitude_value[j]
                                 print("np.shape(self.latitude_new): {}".format(np.shape(self.latitude_new)))
@@ -256,11 +268,13 @@ class Classifier():
                                 for row in range(len(self.latitude[1])):
                                     for i in range(len(self.cntl_pt_cols) - 1):
                                         self.latitude_value = np.linspace(self.latitude[row, i], \
-                                                                     self.latitude[row, i + 1], \
-                                                                     self.cntl_pt_cols[i + 1] - self.cntl_pt_cols[i] + 1)
+                                                                          self.latitude[row, i + 1], \
+                                                                          self.cntl_pt_cols[i + 1] - self.cntl_pt_cols[
+                                                                              i] + 1)
 
                                         for j in range(len(self.latitude_value) - 1):
-                                            self.latitude_new[row, self.cntl_pt_cols[i] - 1 + j] = self.latitude_value[j]
+                                            self.latitude_new[row, self.cntl_pt_cols[i] - 1 + j] = self.latitude_value[
+                                                j]
                                         self.latitude_new[row, np.shape(self.latitude_new)[1] - 1] = self.latitude[
                                             row, np.shape(self.latitude)[1] - 1]
                                 print("np.shape(self.latitude_new): {}".format(np.shape(self.latitude_new)))
@@ -311,7 +325,7 @@ class Classifier():
                                         self.data_cnt += 1
                                         # self.array_alldata[int(self.lon_cood[i][j])][int(self.lat_cood[i][j])].append(self.hdf_value[i][j])
                                         self.array_alldata[int(self.lon_cood[i][j])][int(self.lat_cood[i][j])].append(
-                                                (self.fullname_el[-1], self.hdf_value[i][j]))
+                                            (self.fullname_el[-1], self.hdf_value[i][j]))
 
                                         ### print("self.array_alldata[{}][{}].append({}, {})" \
                                         ###        .format(int(self.lon_cood[i][j]), int(self.lat_cood[i][j]), self.fullname_el[-1],
@@ -319,11 +333,14 @@ class Classifier():
                                         # print("{} data added...".format(self.data_cnt))
 
                             self.total_data_cnt += self.data_cnt
-                            self.Wlon1, self.Elon1, self.Slat1, self.Nlat1, self.Clon1, self.Clat1 = MODIS_AOD_utilities.findRangeOfMap(self.longitude,
-                                                                                                          self.latitude)
+                            self.Wlon1, self.Elon1, self.Slat1, self.Nlat1, self.Clon1, self.Clat1 = MODIS_AOD_utilities.findRangeOfMap(
+                                self.longitude,
+                                self.latitude)
                             self.processing_log += "{0}, {1}, {2}, {3}, {4:.02f}, {5:.02f}, {6:.02f}, {7:.02f}, {8:.02f}, {9:.02f}, {10:.02f}, {11}\n" \
-                                    .format(str(self.file_no), str(self.total_data_cnt), str(self.data_cnt), str(self.fullname_el[-1]),
-                                        np.nanmean(self.hdf_value), np.nanmax(self.hdf_value), np.nanmin(self.hdf_value),
+                                .format(str(self.file_no), str(self.total_data_cnt), str(self.data_cnt),
+                                        str(self.fullname_el[-1]),
+                                        np.nanmean(self.hdf_value), np.nanmax(self.hdf_value),
+                                        np.nanmin(self.hdf_value),
                                         self.Wlon1, self.Elon1, self.Slat1, self.Nlat1, str(self.hdf_raw.attributes()))
 
                     except Exception as err:
@@ -345,38 +362,42 @@ class Classifier():
                 else:
                     np.save('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy' \
                             .format(save_dr, DATAFIELD_NAME,
-                                self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
-                                str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), self.array_alldata)
+                                    self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
+                                    str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), self.array_alldata)
                     Python_utilities.write_log(log_file,
-                            '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy is created...' \
-                                .format(save_dr, DATAFIELD_NAME,
-                                self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
-                                str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
+                                               '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy is created...' \
+                                               .format(save_dr, DATAFIELD_NAME,
+                                                       self.proc_date[0].strftime('%Y%m%d'),
+                                                       self.proc_date[1].strftime('%Y%m%d'),
+                                                       str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
 
                     with open('{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_info.csv' \
-                            .format(save_dr, DATAFIELD_NAME,
-                                self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
-                                str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), 'w') as f:
+                                      .format(save_dr, DATAFIELD_NAME,
+                                              self.proc_date[0].strftime('%Y%m%d'),
+                                              self.proc_date[1].strftime('%Y%m%d'),
+                                              str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), 'w') as f:
                         f.write(self.processing_log)
 
                 print('#' * 60)
                 Python_utilities.write_log(log_file,
-                        '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are is created.\n' \
-                            .format(save_dr, DATAFIELD_NAME,
-                            self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
-                            str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
+                                           '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are is created.\n' \
+                                           .format(save_dr, DATAFIELD_NAME,
+                                                   self.proc_date[0].strftime('%Y%m%d'),
+                                                   self.proc_date[1].strftime('%Y%m%d'),
+                                                   str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)))
+
 
 fullnames = []
-for dirName in base_drs :
-    #dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
-    try :
+for dirName in base_drs:
+    # dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
+    try:
         fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
-    except Exception as err :
-        #Python_utilities.write_log(err_log_file, err)
+    except Exception as err:
+        # Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
 fullnames = sorted(fullnames)
-df = pd.DataFrame({'fullname':fullnames})
+df = pd.DataFrame({'fullname': fullnames})
 
 df = df[df.fullname.str.contains(".hdf")]
 
@@ -391,15 +412,16 @@ print("make datetime column in df:\n{}".format(df))
 # make processing period tuple
 #########################################
 proc_dates = []
-#make processing period tuple
+# make processing period tuple
 from dateutil.relativedelta import relativedelta
-set_S_datetime = datetime(2001, 1, 1) #convert startdate to date type
+
+set_S_datetime = datetime(2001, 1, 1)  # convert startdate to date type
 set_E_datetime = datetime(2022, 1, 1)
 
 date1 = set_S_datetime
 date2 = set_S_datetime
 
-while date2 < set_E_datetime :
+while date2 < set_E_datetime:
     date2 = date1 + relativedelta(days=1)
     dates = (date1, date2)
     proc_dates.append(dates)
@@ -409,13 +431,13 @@ print("len(proc_dates): {}".format(len(proc_dates)))
 #########################################
 
 myMP = Multiprocessor()
-num_cpu = 14
+num_cpu = 8
 values = []
 num_batches = len(proc_dates) // num_cpu + 1
 
 for batch in range(num_batches):
     myMP.restart()
-    for proc_date in proc_dates[batch*num_batches:(batch+1)*num_batches]:
+    for proc_date in proc_dates[batch * num_batches:(batch + 1) * num_batches]:
         myMP.run(Classifier, proc_date)
 
     print("Batch " + str(batch))

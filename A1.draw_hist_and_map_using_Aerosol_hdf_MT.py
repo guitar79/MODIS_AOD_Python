@@ -131,6 +131,7 @@ class Plotter():
                             print("str(hdf_raw.attributes()): {}".format(str(self.hdf_raw.attributes())))
                             
                             #self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
+
                             print("plotting histogram {}".format(self.fullname))
                             self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
                                                                               DATAFIELD_NAME, Dataset_DOI)
