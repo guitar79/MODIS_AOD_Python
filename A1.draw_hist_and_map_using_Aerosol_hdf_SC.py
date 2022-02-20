@@ -29,6 +29,10 @@ if SET_MariaDB == True :
     db_host = '192.168.0.20'
     db_user = 'root'
     db_pass = 'Pkh19255102@'
+    db_user = 'modis'
+    db_pass = 'Modis12345!'
+    #db_user = 'FB107'
+    #db_pass = 'Fb10712345!'
     db_name = 'MODIS_Aerosol'
     table_hdf_info = 'hdf_info'
 
@@ -74,6 +78,8 @@ if SET_MariaDB == True :
 base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
+            "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
+base_drs = ["../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
 #base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2005/"]
 Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MOD04_L2.006"
