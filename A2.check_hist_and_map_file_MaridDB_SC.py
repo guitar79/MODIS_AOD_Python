@@ -104,11 +104,10 @@ class Png_cheker():
                                                       self.fullname[:(self.fullname.find(self.fullname_el[-1])-1)], self.fullname_el[-1][:-4])
             self.q2_sel = cur.execute(self.q2)
             if self.q2_sel == 0 :
+
                 self.q2_hdf = """INSERT INTO `{0}`.`{1}`                                         
-                            (`fullname`, `Wlon`, `Elon`, `Slat`, `Nlat`, `Clon`, `Clat`, 
-                            `Mean_val`, `Min_val`, `Max_val`, `Attribute`) 
-                            VALUES ('{2}', '{3:.03f}', '{4:.03f}', '{5:.03f}', '{6:.03f}', 
-                            '{7:.03f}', '{8:.03f}', '{9:.03f}', '{10:.03f}', '{11:.03f}', '{12}');""".format(db_name, table_hdf_info,
+                            (`fullname`, `histogram_png`, `histogram_png_DT`) 
+                            VALUES ('{2}', '{3:.03f}', '{4:.03f}');""".format(db_name, table_hdf_info,
                                                     self.fullname, self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat,
                                                     np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
                                                     "self.hdf_raw.attributes()")
