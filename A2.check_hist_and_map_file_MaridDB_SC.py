@@ -8,6 +8,7 @@ ALTER USER 'modis'@'%' IDENTIFIED BY 'Modis12345!';
 from glob import glob
 import numpy as np
 import os
+import time
 import MODIS_AOD_utilities
 import Python_utilities
 
@@ -78,9 +79,9 @@ base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 3km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
             "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
-base_drs = ["../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
-            "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
-base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2005/"]
+#base_drs = ["../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/",
+#            "../Aerosol/MODIS Terra C6.1 - Aerosol 5-Min L2 Swath 10km/"]
+#base_drs = ["../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2005/"]
 Dataset_DOI = "http://dx.doi.org/10.5067/MODIS/MOD04_L2.006"
 
 # Set Datafield name
@@ -93,49 +94,86 @@ DATAFIELD_NAME = "Optical_Depth_Land_And_Ocean"
 class Png_cheker():
     def __init__(self, fullname):
         self.fullname = fullname
-        print("Starting: {}".format(self.fullname))
+        if self.fullname[-4:].lower() == ".hdf":
+            print("Starting: {}".format(self.fullname))
 
-        self.fullname_el = self.fullname.split("/")
-        self.filename_el = self.fullname_el[-1].split("/")
+            self.fullname_el = self.fullname.split("/")
+            self.filename_el = self.fullname_el[-1].split("/")
 
-        try :
-            #cur = conn.cursor()
-            self.q2 = """SELECT `id` FROM `{}`.`{}` WHERE `histogram_png`= '{}{}_hist.png';""".format(db_name, table_hdf_info,
-                                                      self.fullname[:(self.fullname.find(self.fullname_el[-1])-1)], self.fullname_el[-1][:-4])
-            self.q2_sel = cur.execute(self.q2)
-            if self.q2_sel == 0 :
+            try :
+                #cur = conn.cursor()
 
-                self.q2_hdf = """INSERT INTO `{0}`.`{1}`                                         
-                            (`fullname`, `histogram_png`, `histogram_png_DT`) 
-                            VALUES ('{2}', '{3:.03f}', '{4:.03f}');""".format(db_name, table_hdf_info,
-                                                    self.fullname, self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat,
-                                                    np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
-                                                    "self.hdf_raw.attributes()")
+                self.q2 = """SELECT `id` FROM `{}`.`{}` WHERE `fullname`= '{}';""".format(db_name,
+                                table_hdf_info, self.fullname)
+                self.q2_sel = cur.execute(self.q2)
+                print("self.q2: {}".format(self.q2))
+                print("self.q2_sel: {}".format(self.q2_sel))
 
-            else :
-                self.q2_hdf = """UPDATE `{0}`.`{1}` 
-                            SET `fullname` = '{2}' , 
-                            `Wlon` = '{3:.03f}', 
-                            `Elon` = '{4:.03f}', 
-                            `Slat` = '{5:.03f}', 
-                            `Nlat` = '{6:.03f}', 
-                            `Clon` = '{7:.03f}', 
-                            `Clat` = '{8:.03f}', 
-                            `Mean_val` = '{9:.03f}', 
-                            `Min_val` = '{10:.03f}', 
-                            `Max_val` = '{11:.03f}', 
-                            `Attribute` = '{12}'  
-                            WHERE `{1}`.`id` = {13};""".format(db_name, table_hdf_info,
-                                                    self.fullname, self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat,
-                                                    np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
-                                                    "self.hdf_raw.attributes()", self.q2_sel)
-            cur.execute(self.q2_hdf)
-            conn.commit()
-            print("inserted:\n {}".format(self.q2_hdf))
+                self.q3 = """SELECT `id` FROM `{}`.`{}` WHERE `histogram_png`= '{}{}_hist.png';""".format(db_name,
+                                table_hdf_info, self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
+                                self.fullname_el[-1][:-4])
+                self.q3_sel = cur.execute(self.q3)
+                print("self.q3: {}".format(self.q3))
+                print("self.q3_sel: {}".format(self.q3_sel))
 
-        except Exception as err:
-            Python_utilities.write_log(err_log_file,
-                                       "{}, error: {}".format(self.fullname_el[-1], err))
+                self.q4 = """SELECT `id` FROM `{}`.`{}` WHERE `fullname`= '{}';""".format(db_name,
+                                table_hdf_info, self.fullname)
+                self.q3_sel = cur.execute(self.q3)
+                print("self.q3: {}".format(self.q3))
+                print("self.q3_sel: {}".format(self.q3_sel))
+
+                self.hist_png_exist = os.path.exists(
+                                '{}{}_hist.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
+                                           self.fullname_el[-1][:-4]))
+                self.map_png_exist = os.path.exists(
+                    '{}{}_map.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
+                                           self.fullname_el[-1][:-4]))
+                if self.q2_sel == 0:
+                    if self.hist_png_exist == 1:
+                        self.hist_png_DT = time.ctime(os.path.getctime('{}{}_hist.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
+                                                   self.fullname_el[-1][:-4])))
+                        self.q3_insert = """INSERT INTO `{0}`.`{1}`                                         
+                                    (`fullname`, `histogram_png`, `histogram_png_DT`) 
+                                    VALUES ('{2}', '{3}', '{4}');""".format(db_name, table_hdf_info, self.fullname,
+                                                    int(self.hist_png_exist), self.hist_png_DT)
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
+                        print("self.q3_insert: {}".format(self.q3_insert))
+
+                    else :
+                        self.q3_insert = """INSERT INTO `{0}`.`{1}`                                         
+                                    (`fullname`, `histogram_png`) 
+                                    VALUES ('{2}', '{3}');""".format(db_name, table_hdf_info, self.fullname, int(self.hist_png_exist))
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
+                        print("self.q3_insert: {}".format(self.q3_insert))
+
+                    cur.execute(self.q3_insert)
+
+                else:
+                    if self.hist_png_exist == 1:
+                        self.q3_update = """UPDATE `{0}`.`{1}` 
+                                        SET `fullname` = '{2}' , 
+                                        `histogram_png` = '{3}', 
+                                        `histogram_png_DT` = '{4}',  
+                                        WHERE `{1}`.`id` = {5};""".format(db_name,
+                                            table_hdf_info, self.fullname, int(self.hist_png_exist), self.hist_png_DT, self.q2_sel)
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
+                        print("self.q3_update: {}".format(self.q3_update))
+                    else:
+                        self.q3_update = """UPDATE `{0}`.`{1}` 
+                                        SET `fullname` = '{2}' , 
+                                        `histogram_png` = '{3}',   
+                                        WHERE `{1}`.`id` = {4};""".format(db_name,
+                                            table_hdf_info, self.fullname, int(self.hist_png_exist), self.q2_sel)
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
+                        print("self.q3_update: {}".format(self.q3_update))
+                    cur.execute(self.q3_update)
+
+                conn.commit()
+                print("#"*30)
+
+            except Exception as err:
+                Python_utilities.write_log(err_log_file,
+                                           "{}, error: {}".format(self.fullname_el[-1], err))
 
 fullnames = []
 for dirName in base_drs :

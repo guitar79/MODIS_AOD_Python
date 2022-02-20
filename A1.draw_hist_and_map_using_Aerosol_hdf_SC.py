@@ -179,7 +179,7 @@ class Plotter():
                             self.q2 = """SELECT `id` FROM `{}`.`{}` WHERE `fullname`= '{}';""".format(db_name, table_hdf_info, self.fullname)
                             self.q2_sel = cur.execute(self.q2)
                             if self.q2_sel == 0 :
-                                self.q2_hdf = """INSERT INTO `{0}`.`{1}`                                         
+                                self.q3_insert = """INSERT INTO `{0}`.`{1}`                                         
                                             (`fullname`, `Wlon`, `Elon`, `Slat`, `Nlat`, `Clon`, `Clat`, 
                                             `Mean_val`, `Min_val`, `Max_val`, `Attribute`) 
                                             VALUES ('{2}', '{3:.03f}', '{4:.03f}', '{5:.03f}', '{6:.03f}', 
@@ -187,9 +187,12 @@ class Plotter():
                                                                     self.fullname, self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat,
                                                                     np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
                                                                     "self.hdf_raw.attributes()")
+                                print("self.q2_sel: {}".format(self.q2_sel))
+                                print("self.q3_insert: {}".format(self.q3_insert))
+                                cur.execute(self.q3_insert)
 
                             else :
-                                self.q2_hdf = """UPDATE `{0}`.`{1}` 
+                                self.q3_update = """UPDATE `{0}`.`{1}` 
                                             SET `fullname` = '{2}' , 
                                             `Wlon` = '{3:.03f}', 
                                             `Elon` = '{4:.03f}', 
@@ -205,7 +208,10 @@ class Plotter():
                                                                     self.fullname, self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat,
                                                                     np.nanmean(self.hdf_value), np.nanmin(self.hdf_value), np.nanmax(self.hdf_value),
                                                                     "self.hdf_raw.attributes()", self.q2_sel)
-                            cur.execute(self.q2_hdf)
+                                print("self.q2_sel: {}".format(self.q2_sel))
+                                print("self.q3_update: {}".format(self.q3_update))
+                                cur.execute(self.q3_update)
+
                             conn.commit()
                             print("inserted:\n {}".format(self.q2_hdf))
 
