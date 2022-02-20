@@ -9,6 +9,7 @@ from glob import glob
 import numpy as np
 import os
 import time
+from datetime import datetime
 import MODIS_AOD_utilities
 import Python_utilities
 
@@ -107,8 +108,8 @@ class Png_cheker():
                                 table_hdf_info, self.fullname)
                 self.q2_sel = cur.execute(self.q2)
                 print("self.q2: {}".format(self.q2))
-                print("self.q2_sel: {}".format(self.q2_sel))
 
+                '''
                 self.q3 = """SELECT `id` FROM `{}`.`{}` WHERE `histogram_png`= '{}{}_hist.png';""".format(db_name,
                                 table_hdf_info, self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
                                 self.fullname_el[-1][:-4])
@@ -118,55 +119,112 @@ class Png_cheker():
 
                 self.q4 = """SELECT `id` FROM `{}`.`{}` WHERE `fullname`= '{}';""".format(db_name,
                                 table_hdf_info, self.fullname)
-                self.q3_sel = cur.execute(self.q3)
-                print("self.q3: {}".format(self.q3))
-                print("self.q3_sel: {}".format(self.q3_sel))
+                self.q4_sel = cur.execute(self.q4)
+                print("self.q3: {}".format(self.q4))
+                print("self.q3_sel: {}".format(self.q4_sel))
+                '''
 
                 self.hist_png_exist = os.path.exists(
                                 '{}{}_hist.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
                                            self.fullname_el[-1][:-4]))
-                self.map_png_exist = os.path.exists(
-                    '{}{}_map.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
-                                           self.fullname_el[-1][:-4]))
+
                 if self.q2_sel == 0:
+                    print("self.q2_sel: {}".format(self.q2_sel))
                     if self.hist_png_exist == 1:
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
                         self.hist_png_DT = time.ctime(os.path.getctime('{}{}_hist.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
                                                    self.fullname_el[-1][:-4])))
+                        print("self.hist_png_DT: {}".format(self.hist_png_DT))
+                        self.hist_png_DT = datetime.strptime(self.hist_png_DT, "%a %b %d %H:%M:%S %Y")
+                        print("self.hist_png_DT.strftime('%Y-%m-%d %H:%M:%S'): {}".format(self.hist_png_DT.strftime('%Y-%m-%d %H:%M:%S')))
                         self.q3_insert = """INSERT INTO `{0}`.`{1}`                                         
                                     (`fullname`, `histogram_png`, `histogram_png_DT`) 
                                     VALUES ('{2}', '{3}', '{4}');""".format(db_name, table_hdf_info, self.fullname,
                                                     int(self.hist_png_exist), self.hist_png_DT)
-                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
+
                         print("self.q3_insert: {}".format(self.q3_insert))
 
                     else :
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
                         self.q3_insert = """INSERT INTO `{0}`.`{1}`                                         
                                     (`fullname`, `histogram_png`) 
                                     VALUES ('{2}', '{3}');""".format(db_name, table_hdf_info, self.fullname, int(self.hist_png_exist))
-                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
+
                         print("self.q3_insert: {}".format(self.q3_insert))
 
                     cur.execute(self.q3_insert)
 
                 else:
+                    print("self.q2_sel: {}".format(self.q2_sel))
                     if self.hist_png_exist == 1:
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
                         self.q3_update = """UPDATE `{0}`.`{1}` 
                                         SET `fullname` = '{2}' , 
                                         `histogram_png` = '{3}', 
                                         `histogram_png_DT` = '{4}',  
                                         WHERE `{1}`.`id` = {5};""".format(db_name,
                                             table_hdf_info, self.fullname, int(self.hist_png_exist), self.hist_png_DT, self.q2_sel)
-                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
                         print("self.q3_update: {}".format(self.q3_update))
                     else:
+                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
                         self.q3_update = """UPDATE `{0}`.`{1}` 
                                         SET `fullname` = '{2}' , 
                                         `histogram_png` = '{3}',   
                                         WHERE `{1}`.`id` = {4};""".format(db_name,
                                             table_hdf_info, self.fullname, int(self.hist_png_exist), self.q2_sel)
-                        print("self.hist_png_exist: {}".format(self.hist_png_exist))
                         print("self.q3_update: {}".format(self.q3_update))
                     cur.execute(self.q3_update)
+
+                self.map_png_exist = os.path.exists(
+                        '{}{}_map.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
+                                              self.fullname_el[-1][:-4]))
+
+                if self.q2_sel == 0:
+                    print("self.q2_sel: {}".format(self.q2_sel))
+                    if self.map_png_exist == 1:
+                        print("self.map_png_exist: {}".format(self.map_png_exist))
+                        self.map_png_DT = time.ctime(os.path.getctime('{}{}_map.png'.format(self.fullname[:(self.fullname.find(self.fullname_el[-1]))],
+                                                   self.fullname_el[-1][:-4])))
+                        print("self.map_png_DT: {}".format(self.map_png_DT))
+                        self.map_png_DT = datetime.strptime(self.map_png_DT, "%a %b %d %H:%M:%S %Y")
+                        print("self.map_png_DT.strftime('%Y-%m-%d %H:%M:%S'): {}".format(self.map_png_DT.strftime('%Y-%m-%d %H:%M:%S')))
+                        self.q4_insert = """INSERT INTO `{0}`.`{1}`                                         
+                                    (`fullname`, `map_png`, `map_png_DT`) 
+                                    VALUES ('{2}', '{3}', '{4}');""".format(db_name, table_hdf_info, self.fullname,
+                                                    int(self.map_png_exist), self.map_png_DT)
+
+                        print("self.q4_insert: {}".format(self.q4_insert))
+
+                    else :
+                        print("self.map_png_exist: {}".format(self.map_png_exist))
+                        self.q4_insert = """INSERT INTO `{0}`.`{1}`                                         
+                                    (`fullname`, `map_png`) 
+                                    VALUES ('{2}', '{3}');""".format(db_name, table_hdf_info, self.fullname, int(self.map_png_exist))
+
+                        print("self.q4_insert: {}".format(self.q4_insert))
+
+                    cur.execute(self.q4_insert)
+
+                else:
+                    print("self.q2_sel: {}".format(self.q2_sel))
+                    if self.map_png_exist == 1:
+                        print("self.map_png_exist: {}".format(self.map_png_exist))
+                        self.q4_update = """UPDATE `{0}`.`{1}` 
+                                        SET `fullname` = '{2}' , 
+                                        `map_png` = '{3}', 
+                                        `map_png_DT` = '{4}',  
+                                        WHERE `{1}`.`id` = {5};""".format(db_name,
+                                            table_hdf_info, self.fullname, int(self.map_png_exist), self.map_png_DT, self.q2_sel)
+                        print("self.q4_update: {}".format(self.q4_update))
+                    else:
+                        print("self.map_png_exist: {}".format(self.map_png_exist))
+                        self.q4_update = """UPDATE `{0}`.`{1}` 
+                                        SET `fullname` = '{2}' , 
+                                        `map_png` = '{3}',   
+                                        WHERE `{1}`.`id` = {4};""".format(db_name,
+                                            table_hdf_info, self.fullname, int(self.map_png_exist), self.q2_sel)
+                        print("self.q4_update: {}".format(self.q4_update))
+                    cur.execute(self.q4_update)
 
                 conn.commit()
                 print("#"*30)
@@ -174,6 +232,8 @@ class Png_cheker():
             except Exception as err:
                 Python_utilities.write_log(err_log_file,
                                            "{}, error: {}".format(self.fullname_el[-1], err))
+
+#SELECT `fullname` FROM `hdf_info` WHERE `histogram_png` IS NULL ORDER BY `histogram_png` DESC
 
 fullnames = []
 for dirName in base_drs :
