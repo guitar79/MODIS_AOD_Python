@@ -6250,3 +6250,8 @@
 [2022-02-20 23:09:54] MYD04_3K.A2002343.1715.061.2018005005500.hdf, error: autodetected range of [nan, nan] is not finite
 [2022-02-20 14:11:19] MOD04_L2.A2000105.0310.061.2017207073310.hdf, error: autodetected range of [nan, nan] is not finite
 [2022-02-20 23:11:27] MYD04_3K.A2002343.1850.061.2018005005608.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-20 23:13:42] MYD04_3K.A2002343.2025.061.2018005005603.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-20 23:13:44] MYD04_3K.A2002343.2030.061.2018005005650.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-20 23:15:51] MYD04_3K.A2002343.2205.061.2018005005731.hdf, error: autodetected range of [nan, nan] is not finite
+[2022-02-20 14:16:22] MOD04_L2.A2000105.0355.061.2017207073914.hdf, error: x and y arguments to pcolormesh cannot have non-finite values or be of type numpy.ma.core.MaskedArray with masked values
+[2022-02-20 14:16:24] MOD04_L2.A2000105.0445.061.2017207072522.hdf, error: autodetected range of [nan, nan] is not finite
