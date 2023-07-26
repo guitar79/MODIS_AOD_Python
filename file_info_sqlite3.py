@@ -23,7 +23,7 @@ import numpy as np
 import os
 from pathlib import Path
 
-import Python_utilities
+import _Python_utilities
 
 
 import sqlite3
@@ -55,7 +55,7 @@ DB_fn = 'Aerosel_file_info.sqlite'
 table_hdf_info = 'hdf_info'
 # def create_connection(drbase+drin+infile):
 
-conn = Python_utilities.create_connection(r'{}{}'.format(base_dr, DB_fn))
+conn = _Python_utilities.create_connection(r'{}{}'.format(base_dr, DB_fn))
 
 cur = conn.cursor()
 

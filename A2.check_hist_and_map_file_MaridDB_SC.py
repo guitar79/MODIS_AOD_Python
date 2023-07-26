@@ -10,8 +10,8 @@ import numpy as np
 import os
 import time
 from datetime import datetime
-import MODIS_AOD_utilities
-import Python_utilities
+import _MODIS_AOD_utilities
+import _Python_utilities
 
 #########################################
 log_dir = "logs/"
@@ -230,7 +230,7 @@ class Png_cheker():
                 print("#"*30)
 
             except Exception as err:
-                Python_utilities.write_log(err_log_file,
+                _Python_utilities.write_log(err_log_file,
                                            "{}, error: {}".format(self.fullname_el[-1], err))
 
 #SELECT `fullname` FROM `hdf_info` WHERE `histogram_png` IS NULL ORDER BY `histogram_png` DESC
@@ -239,9 +239,9 @@ fullnames = []
 for dirName in base_drs :
     #dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
     try :
-        fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
+        fullnames.extend(_Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
     except Exception as err :
-        #Python_utilities.write_log(err_log_file, err)
+        #_Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
 #fullnames = sorted(fullnames)

@@ -8,8 +8,8 @@ from glob import glob
 import numpy as np
 import os
 from netCDF4 import Dataset as NetCDFFile
-import MODIS_AOD_utilities
-import Python_utilities
+import _MODIS_AOD_utilities
+import _Python_utilities
 
 #########################################
 log_dir = "logs/"
@@ -45,7 +45,7 @@ print(working_Datetetimes)
 n = 0
 for working_Date in working_Datetetimes[:]:
     #working_Date = working_Datetetimes[0]
-    working_Jday = MODIS_AOD_utilities.datestr_to_JDay(working_Date, "%Y-%m-%d")
+    working_Jday = _MODIS_AOD_utilities.datestr_to_JDay(working_Date, "%Y-%m-%d")
     working_Date = datetime.strptime(working_Date, "%Y-%m-%d")
 
     n += 1
@@ -55,7 +55,7 @@ for working_Date in working_Datetetimes[:]:
     print("Starting...   working_Date: {}".format(working_Date))
 
     # get fullnames
-    fullnames = Python_utilities.getFullnameListOfallFiles("{}{}".format(base_dr, working_Date.strftime("%Y/")))
+    fullnames = _Python_utilities.getFullnameListOfallFiles("{}{}".format(base_dr, working_Date.strftime("%Y/")))
     #fullnames = sorted(
     #    glob(os.path.join("{}{}{}/".format(base_dr, working_Date.strftime("%Y/"), working_Jday), '*.hdf')))
 
@@ -76,7 +76,7 @@ for working_Date in working_Datetetimes[:]:
 
             try :
                 hdf_raw, latitude, longitude, cntl_pt_cols, cntl_pt_rows \
-                    = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME)
+                    = _MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME)
                 hdf_value = hdf_raw[:, :]
                 if 'bad_value_scaled' in hdf_raw.attributes() :
                     #hdf_value[hdf_value == hdf_raw.attributes()['bad_value_scaled']] = np.nan
@@ -127,25 +127,25 @@ for working_Date in working_Datetetimes[:]:
                 print("hdf_value: {}".format(hdf_value))
                 print("str(hdf_raw.attributes()): {}".format(str(hdf_raw.attributes())))
 
-                #Wlon, Elon, Slat, Nlat, Clon, Clat = MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
+                #Wlon, Elon, Slat, Nlat, Clon, Clat = _MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
                 print("plotting histogram {}".format(fullname))
-                plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
+                plt_hist = _MODIS_AOD_utilities.draw_histogram_hdf(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
                 plt_hist.savefig("{}{}_hist.png".format(save_dr, fullname_el[-1][:-4]), overwrite=True)
                 plt_hist.close()
                 ######################################################################################
-                Python_utilities.write_log(log_file, "{}{}_hist.png is created...".format(save_dr, fullname_el[-1][:-4]))
+                _Python_utilities.write_log(log_file, "{}{}_hist.png is created...".format(save_dr, fullname_el[-1][:-4]))
 
                 print("plotting on the map {}".format(fullname))
                 #Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
-                plt_map = MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
+                plt_map = _MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(hdf_value, longitude, latitude, fullname, DATAFIELD_NAME, Dataset_DOI)
                 plt_map.savefig("{}{}_map.png".format(save_dr, fullname_el[-1][:-4]), overwrite=True)
                 plt_map.close()
                 ######################################################################################
 
-                Python_utilities.write_log(log_file,
+                _Python_utilities.write_log(log_file,
                               "{}{}_map.png is created...".format(save_dr, fullname_el[-1][:-4]))
 
             except Exception as err :
-                #MODIS_AOD_utilities.write_log(err_log_file, err)
+                #_MODIS_AOD_utilities.write_log(err_log_file, err)
                 print(err)
                 continue

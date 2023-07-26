@@ -15,8 +15,8 @@ import os
 import numpy as np
 import pandas as pd
 from datetime import datetime
-import MODIS_AOD_utilities
-import Python_utilities
+import _MODIS_AOD_utilities
+import _Python_utilities
 
 # threading library
 from queue import Queue
@@ -64,9 +64,9 @@ fullnames = []
 for dirName in base_drs:
     # dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
     try:
-        fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
+        fullnames.extend(_Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
     except Exception as err:
-        # Python_utilities.write_log(err_log_file, err)
+        # _Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
         
@@ -78,7 +78,7 @@ print("Only hdf file in df:\n{}".format(df))
 
 for idx, row in df.iterrows():
     print(row["fullname"])
-    df.at[idx, "fullname_dt"] = MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.loc[idx, "fullname"])
+    df.at[idx, "fullname_dt"] = _MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.loc[idx, "fullname"])
 
 df.index = df['fullname_dt']
 print("make datetime column in df:\n{}".format(df))
@@ -141,7 +141,7 @@ for proc_date in proc_dates[:]:
             # make array_data
             print("{0}-{1} Start making grid arrays...\n". \
                   format(proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d')))
-            array_data = MODIS_AOD_utilities.make_grid_array(Llon, Rlon, Slat, Nlat, resolution)
+            array_data = _MODIS_AOD_utilities.make_grid_array(Llon, Rlon, Slat, Nlat, resolution)
             print('Grid arrays are created...........\n')
 
             total_data_cnt = 0
@@ -160,7 +160,7 @@ for proc_date in proc_dates[:]:
 
                 try:
                     hdf_raw, latitude, longitude, cntl_pt_cols, cntl_pt_rows \
-                        = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME)
+                        = _MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(fullname, DATAFIELD_NAME)
 
                     hdf_value = hdf_raw[:, :]
 
@@ -330,14 +330,14 @@ for proc_date in proc_dates[:]:
                                     # print("{} data added...".format(data_cnt))
 
                         total_data_cnt += data_cnt
-                        Wlon1, Elon1, Slat1, Nlat1, Clon1, Clat1 = MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
+                        Wlon1, Elon1, Slat1, Nlat1, Clon1, Clat1 = _MODIS_AOD_utilities.findRangeOfMap(longitude, latitude)
                         processing_log += "{0}, {1}, {2}, {3}, {4:.02f}, {5:.02f}, {6:.02f}, {7:.02f}, {8:.02f}, {9:.02f}, {10:.02f}, {11}\n" \
                             .format(str(file_no), str(total_data_cnt), str(data_cnt), str(fullname),
                                 np.nanmean(hdf_value), np.nanmax(hdf_value), np.nanmin(hdf_value),
                                 Wlon1, Elon1, Slat1, Nlat1, str(hdf_raw.attributes()))
 
                 except Exception as err:
-                    # Python_utilities.write_log(err_log_file, err)
+                    # _Python_utilities.write_log(err_log_file, err)
                     print(err)
                     continue
 
@@ -357,7 +357,7 @@ for proc_date in proc_dates[:]:
                     .format(save_dr, DATAFIELD_NAME,
                         proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),
                         str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), array_alldata)
-                Python_utilities.write_log(log_file,
+                _Python_utilities.write_log(log_file,
                         '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy is created...' \
                         .format(save_dr, DATAFIELD_NAME,
                         proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),
@@ -370,7 +370,7 @@ for proc_date in proc_dates[:]:
                     f.write(processing_log)
 
             print('#' * 60)
-            Python_utilities.write_log(log_file,
+            _Python_utilities.write_log(log_file,
                 '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are is created.\n{9} files are finished...' \
                 .format(save_dr, DATAFIELD_NAME,
                     proc_date[0].strftime('%Y%m%d'), proc_date[1].strftime('%Y%m%d'),

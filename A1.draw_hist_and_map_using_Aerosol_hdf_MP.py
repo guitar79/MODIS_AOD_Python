@@ -8,8 +8,8 @@
 from glob import glob
 import numpy as np
 import os
-import MODIS_AOD_utilities
-import Python_utilities
+import _MODIS_AOD_utilities
+import _Python_utilities
 from datetime import datetime
 
 #########################################
@@ -93,7 +93,7 @@ class Plotter():
                 print("Reading hdf file {0}\n".format(self.fullname))
                 try:
                     self.hdf_raw, self.latitude, self.longitude, self.cntl_pt_cols, self.cntl_pt_rows \
-                            = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
+                            = _MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
                     self.hdf_value = self.hdf_raw[:, :]
                     if 'bad_value_scaled' in self.hdf_raw.attributes():
                         # hdf_value[hdf_value == hdf_raw.attributes()['bad_value_scaled']] = np.nan
@@ -144,7 +144,7 @@ class Plotter():
                     print("hdf_value: {}".format(self.hdf_value))
                     print("str(hdf_raw.attributes()): {}".format(str(self.hdf_raw.attributes())))
 
-                    self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
+                    self.Wlon, self.Elon, self.Slat, self.Nlat, self.Clon, self.Clat = _MODIS_AOD_utilities.findRangeOfMap(self.longitude, self.latitude)
                     #filename, Wlon, Elon, Slat, Nlat, mean(hdf_value), min(hdf_value), max(hdf_value), hdf_raw.attributes()
                     self.hdf_info = "{},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{:.03f},{}\n".format(self.fullname_el[-1],
                             self.Wlon, self.Elon, self.Slat, self.Nlat,
@@ -156,35 +156,35 @@ class Plotter():
                         print("added {}.csv".format(self.fullname[:(self.fullname.find(self.fullname_el[3]) - 1)]))
 
                     print("plotting histogram {}".format(self.fullname))
-                    self.plt_hist = MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
+                    self.plt_hist = _MODIS_AOD_utilities.draw_histogram_hdf(self.hdf_value, self.longitude, self.latitude, self.fullname,
                                                                       DATAFIELD_NAME, Dataset_DOI)
                     self.plt_hist.savefig("{}{}_hist.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
                     self.plt_hist.close()
                     ######################################################################################
-                    Python_utilities.write_log(log_file,
+                    _Python_utilities.write_log(log_file,
                             "{}{}_hist.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
                     # Llon, Rlon, Slat, Nlat = np.min(longitude), np.max(longitude), np.min(latitude), np.max(latitude)
                     print("plotting on the map {}".format(self.fullname))
-                    self.plt_map = MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(self.hdf_value, self.longitude, self.latitude, self.fullname,
+                    self.plt_map = _MODIS_AOD_utilities.draw_map_MODIS_hdf_onefile(self.hdf_value, self.longitude, self.latitude, self.fullname,
                                                                              DATAFIELD_NAME, Dataset_DOI)
                     self.plt_map.savefig("{}{}_map.png".format(self.save_dr, self.fullname_el[-1][:-4]), overwrite=True)
                     self.plt_map.close()
                     ######################################################################################
-                    Python_utilities.write_log(log_file,
+                    _Python_utilities.write_log(log_file,
                             "{}{}_map.png is created...".format(self.save_dr, self.fullname_el[-1][:-4]))
 
                 except Exception as err:
-                    Python_utilities.write_log(err_log_file,
+                    _Python_utilities.write_log(err_log_file,
                             "{}, error: {}".format(self.fullname_el[-1], err))
 
 fullnames = []
 for dirName in base_drs :
     #dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
     try :
-        fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
+        fullnames.extend(_Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
     except Exception as err :
-        #Python_utilities.write_log(err_log_file, err)
+        #_Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
 #fullnames = sorted(fullnames)

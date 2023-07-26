@@ -8,8 +8,8 @@
 import numpy as np
 import pandas as pd
 import os
-import MODIS_AOD_utilities
-import Python_utilities
+import _MODIS_AOD_utilities
+import _Python_utilities
 from datetime import datetime
 
 #########################################
@@ -131,7 +131,7 @@ class Classifier():
                 # make array_data
                 print("{0}-{1} Start making grid arrays...\n". \
                       format(self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d')))
-                array_data = MODIS_AOD_utilities.make_grid_array(Llon, Rlon, Slat, Nlat, resolution)
+                array_data = _MODIS_AOD_utilities.make_grid_array(Llon, Rlon, Slat, Nlat, resolution)
                 print('Grid arrays are created...........\n')
 
                 self.total_data_cnt = 0
@@ -151,7 +151,7 @@ class Classifier():
 
                     try:
                         self.hdf_raw, self.latitude, self.longitude, self.cntl_pt_cols, self.cntl_pt_rows \
-                            = MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
+                            = _MODIS_AOD_utilities.read_MODIS_hdf_to_ndarray(self.fullname, DATAFIELD_NAME)
 
                         self.hdf_value = self.hdf_raw[:, :]
 
@@ -333,7 +333,7 @@ class Classifier():
                                         # print("{} data added...".format(self.data_cnt))
 
                             self.total_data_cnt += self.data_cnt
-                            self.Wlon1, self.Elon1, self.Slat1, self.Nlat1, self.Clon1, self.Clat1 = MODIS_AOD_utilities.findRangeOfMap(
+                            self.Wlon1, self.Elon1, self.Slat1, self.Nlat1, self.Clon1, self.Clat1 = _MODIS_AOD_utilities.findRangeOfMap(
                                 self.longitude,
                                 self.latitude)
                             self.processing_log += "{0}, {1}, {2}, {3}, {4:.02f}, {5:.02f}, {6:.02f}, {7:.02f}, {8:.02f}, {9:.02f}, {10:.02f}, {11}\n" \
@@ -344,7 +344,7 @@ class Classifier():
                                         self.Wlon1, self.Elon1, self.Slat1, self.Nlat1, str(self.hdf_raw.attributes()))
 
                     except Exception as err:
-                        # Python_utilities.write_log(err_log_file, err)
+                        # _Python_utilities.write_log(err_log_file, err)
                         print(err)
                         continue
 
@@ -364,7 +364,7 @@ class Classifier():
                             .format(save_dr, DATAFIELD_NAME,
                                     self.proc_date[0].strftime('%Y%m%d'), self.proc_date[1].strftime('%Y%m%d'),
                                     str(Llon), str(Rlon), str(Slat), str(Nlat), str(resolution)), self.array_alldata)
-                    Python_utilities.write_log(log_file,
+                    _Python_utilities.write_log(log_file,
                                                '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8}_alldata.npy is created...' \
                                                .format(save_dr, DATAFIELD_NAME,
                                                        self.proc_date[0].strftime('%Y%m%d'),
@@ -379,7 +379,7 @@ class Classifier():
                         f.write(self.processing_log)
 
                 print('#' * 60)
-                Python_utilities.write_log(log_file,
+                _Python_utilities.write_log(log_file,
                                            '{0}{1}_{2}_{3}_{4}_{5}_{6}_{7}_{8} files are is created.\n' \
                                            .format(save_dr, DATAFIELD_NAME,
                                                    self.proc_date[0].strftime('%Y%m%d'),
@@ -391,9 +391,9 @@ fullnames = []
 for dirName in base_drs:
     # dirName = "../Aerosol/MODIS Aqua C6.1 - Aerosol 5-Min L2 Swath 3km/2002/185/"
     try:
-        fullnames.extend(Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
+        fullnames.extend(_Python_utilities.getFullnameListOfallFiles("{}".format(dirName)))
     except Exception as err:
-        # Python_utilities.write_log(err_log_file, err)
+        # _Python_utilities.write_log(err_log_file, err)
         print(err)
         continue
 fullnames = sorted(fullnames)
@@ -403,7 +403,7 @@ df = df[df.fullname.str.contains(".hdf")]
 
 for idx, row in df.iterrows():
     print(row["fullname"])
-    df.at[idx, "fullname_dt"] = MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.loc[idx, "fullname"])
+    df.at[idx, "fullname_dt"] = _MODIS_AOD_utilities.fullname_to_datetime_for_DAAC3K(df.loc[idx, "fullname"])
 
 df.index = df['fullname_dt']
 print("make datetime column in df:\n{}".format(df))
