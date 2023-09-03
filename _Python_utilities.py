@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Thu Nov 22 01:00:19 2018
 @author: guitar79@naver.com
