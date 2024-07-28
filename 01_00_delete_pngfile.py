@@ -29,6 +29,8 @@ if not os.path.exists('{0}'.format(log_dir)):
 #######################################################
 # read all files in base directory for processing
 BASEDIR = Path("/mnt/Rdata/MODIS_AOD/Aerosol/") 
+BASEDIR = Path("R:\MODIS_AOD/Aerosol/") 
+
 ###
 DOINGDIR = Path(BASEDIR/ "MOD04_3K")
 DOINGDIR = Path(BASEDIR/ "MOD04_L2")
